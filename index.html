@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b6e5f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Monatsflash Budget-Starter</title>
+<style>
+:root{--acc:#0b6e5f;--soft:#dcefea;--inp:#fff3b0;--grey:#f2f5f4;--line:#c9d4d0;--txt:#1d2a27;--mut:#5b6b67;--red:#b3261e;--redbg:#f8d0cc;--amber:#fbe3b0;--green:#cdebd0;--bg:#fafcfb}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--txt);background:var(--bg);padding-bottom:84px}
+header{background:var(--acc);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0}
+header button{background:transparent;border:0;color:#fff;font-size:24px;padding:4px 8px}
+main{max-width:760px;margin:0 auto;padding:16px}
+h2{font-size:22px;color:var(--acc);margin:4px 0 4px}
+h3{font-size:17px;color:var(--acc);margin:22px 0 6px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.card.soft{background:var(--soft);border-color:var(--soft)}
+.msg{background:var(--soft);border-radius:12px;padding:12px;font-weight:600;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.name{font-weight:700}
+.hint{font-size:13px;color:var(--mut)}
+input,select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--inp);width:100%;min-width:0;color:var(--txt)}
+input.txt{background:#fff}
+.calc{background:var(--grey);border:1px solid var(--line);border-radius:8px;padding:8px;font-weight:700;text-align:right;min-height:38px}
+.weeks{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
+.weeks label{font-size:11px;color:var(--mut);display:block;text-align:center}
+.weeks input{text-align:right;padding:8px 4px}
+.weeks input.over{background:var(--redbg);color:#8a1c14;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:13px;margin-top:6px}
+.stats b{display:block;font-size:15px}
+.neg{color:var(--red)}
+.badge{padding:3px 10px;border-radius:99px;font-size:13px;font-weight:700;background:var(--grey)}
+.b-ok{background:var(--green);color:#1b5e20}.b-knapp{background:var(--amber);color:#7a4b00}.b-drueber{background:var(--redbg);color:#8a1c14}.b-toll{background:#a5d6a7;color:#1b5e20}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin:0 -4px}
+.chips button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:14px}
+.chips button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lab{font-size:12px;color:var(--mut);margin:6px 0 2px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:600}
+.btn.sec{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+.btn.red{background:#fff;color:var(--red);border:1px solid var(--red)}
+.bar{height:10px;background:var(--grey);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:#4fc3ae;width:0}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:1;border:0;background:transparent;padding:8px 2px 10px;font:inherit;font-size:12px;color:var(--mut)}
+nav button span{display:block;font-size:20px}
+nav button.on{color:var(--acc);font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:var(--acc);color:#fff;padding:6px 4px;font-size:12px}
+td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:right;white-space:nowrap}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:#fff}
+th:first-child{background:var(--acc)}
+tr.tot td{font-weight:700;background:var(--grey)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.tile b{display:block;font-size:20px;color:var(--acc)}
+.tile span{font-size:12px;color:var(--mut)}
+.menu{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10;display:none}
+.menu.on{display:block}
+.menu div{background:#fff;margin:60px 16px 0 auto;max-width:320px;border-radius:12px;padding:12px;display:grid;gap:8px}
+.x{border:0;background:transparent;color:var(--red);font-size:20px}
+ol{padding-left:20px}
+@media print{header,nav,.chips,.btn{display:none}body{padding:0}}
+</style>
+</head>
+<body>
+<header><h1>Budget-Starter</h1><button id="menuBtn" aria-label="Menü">⋯</button></header>
+<main id="main"></main>
+<nav id="nav">
+<button data-v="start"><span>🏠</span>Start</button>
+<button data-v="budget"><span>🎯</span>Budget</button>
+<button data-v="monat"><span>📅</span>Monat</button>
+<button data-v="rueck"><span>🐷</span>Rücklagen</button>
+<button data-v="jahr"><span>📊</span>Jahr</button>
+</nav>
+<div class="menu" id="menu"><div>
+<button class="btn sec" id="mExport">Sicherung speichern</button>
+<button class="btn sec" id="mImport">Sicherung laden</button>
+<button class="btn sec" id="mPrint">Seite drucken</button>
+<button class="btn sec" id="mNew">Neues Jahr beginnen</button>
+<button class="btn red" id="mReset">Alles löschen</button>
+<button class="btn" id="mClose">Schließen</button>
+<input type="file" id="file" accept=".json,application/json" style="display:none">
+</div></div>
+<script>
+"use strict";
+const KEY="budgetstarter.v1";
+const MON=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const MONL=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const TOEPFE=[
+["Lebensmittel & Getränke","Essen und Trinken aus Supermarkt und Bäcker (auch Pfand)"],
+["Drogerie & Haushalt","Putzmittel, Waschpulver, Zahnpasta, Shampoo, Hygiene"],
+["Kind","Windeln und Babynahrung (nur der laufende Bedarf)"],
+["Tanken","Nur Kraftstoff fürs Auto"],
+["Tierfutter","Futter für Haustiere"],
+["Außer Haus","Restaurant, Café, Lieferdienst, Imbiss"],
+["Freizeit","Ausflüge, Hobby, Vereine, Kino, Kultur"],
+["Eigener Topf 1","Frei: dein eigener Alltags-Topf (Name und Beschreibung änderbar)"],
+["Eigener Topf 2","Frei: dein eigener Alltags-Topf"],
+["Eigener Topf 3","Frei: dein eigener Alltags-Topf"]];
+const RUECK=[
+["Auto","TÜV, Inspektion, Reifen"],
+["Kind","Autositz, nächste Kleidergröße, Fahrrad"],
+["Feste & Geschenke","Weihnachten, Geburtstage"],
+["Urlaub","Sommerurlaub"],
+["Haus & Gesundheit","Reparaturen, Brille, Zuzahlungen"],
+["Eigene Rücklage 1",""],["Eigene Rücklage 2",""],["Eigene Rücklage 3",""]];
+const NT=TOEPFE.length, NR=RUECK.length;
+
+function freshState(){
+  const now=new Date();
+  return {v:1,jahr:now.getFullYear(),
+    t:TOEPFE.map(([n,h])=>({n,h,avg:null,b:null})),
+    r:RUECK.map(([n,h])=>({n,h,k:null,s:null})),
+    sb:null,kaeufe:[],extra:[],
+    m:MON.map(()=>({w:TOEPFE.map(()=>[null,null,null,null,null]),spar:null,rueck:null,rIdx:null,naechst:null,fehl:"",ueb:null}))};
+}
+let S=load();
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1&&s.t&&s.m)return s;}catch(e){}
+  return freshState();
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let UI={v:"start",m:(()=>{const d=new Date();return d.getFullYear()===S.jahr?d.getMonth():0;})()};
+
+const N0=x=>(x==null||isNaN(x))?0:x;
+const r2=x=>Math.round(x*100)/100;
+const eurF=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"});
+const eur=x=>x==null?"":(x===0?"–":eurF.format(x));
+const eur0=x=>x==null?"":eurF.format(x);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const numStr=x=>x==null?"":String(x).replace(".",",");
+const parseNum=s=>{s=String(s).trim().replace(/\s|€/g,"");if(s==="")return null;if(s.includes(",")) s=s.replace(/\./g,"").replace(",",".");const n=parseFloat(s);return isNaN(n)?null:n;};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function nin(path,val,extra=""){return `<input class="num" inputmode="decimal" data-p="${path}" data-ty="n" value="${numStr(val)}" ${extra}>`;}
+function tin(path,val,extra=""){return `<input class="txt" data-p="${path}" data-ty="t" value="${esc(val)}" ${extra}>`;}
+
+/* ---------- Berechnungen ---------- */
+function calcMonth(mi,depth=0){
+  const M=S.m[mi];
+  const rows=S.t.map((t,i)=>{
+    const w=M.w[i], sum=r2(w.reduce((a,x)=>a+N0(x),0)), bud=t.b, f5=w[4]!=null;
+    let left=bud==null?null:r2(bud-sum), st="";
+    if(bud!=null) st=sum>bud?"drüber":f5?"Toll gemacht!":sum>=0.8*bud?"knapp":"ok";
+    return {sum,bud,wk:bud==null?null:bud/4,left,st,f5};
+  });
+  const tSum=r2(rows.reduce((a,r)=>a+r.sum,0));
+  const budRows=rows.filter(r=>r.bud!=null);
+  const tBud=r2(budRows.reduce((a,r)=>a+r.bud,0));
+  const ueb=mi===0?N0(M.ueb):carry(mi-1);
+  const spendBud=r2(rows.filter(r=>N0(r.bud)>0).reduce((a,r)=>a+r.sum,0));
+  const J=tBud===0?null:r2(tBud+ueb-spendBud);
+  const active=tSum>0;
+  const rest=(J==null||!active)?null:Math.max(0,J);
+  const fehl=(J==null||!active)?null:Math.max(0,r2(-J));
+  const nv=rest==null?null:r2(rest-N0(M.spar)-N0(M.rueck)-N0(M.naechst));
+  const carryOut=r2(N0(M.naechst)-(M.fehl==="Ja"?N0(fehl):0));
+  const allDone=budRows.length>0&&budRows.every(r=>r.f5);
+  return {rows,tSum,tBud,ueb,J,rest,fehl,nv,carryOut,active,allDone};
+}
+function carry(mi){ if(mi<0)return 0; const M=S.m[mi]; const c=calcMonth(mi); return c.carryOut; }
+function monthMsg(c){
+  if(c.tBud===0)return "Lege zuerst im Tab „Budget“ dein Monatsbudget fest. Dann siehst du hier, wie du dich schlägst.";
+  if(c.tSum===0)return "Noch keine Einträge in diesem Monat. Trage am Ende der ersten Woche deine Summen ein.";
+  if(c.J<0)return "Du liegst über deinem Budget. Kein Drama: Schau dir den Topf mit der roten Ampel an und überlege, was du nächsten Monat anders machen möchtest.";
+  if(c.allDone)return "Toll gemacht! Du hast den Monat unter deinem Budget abgeschlossen. Der Betrag in „Noch übrig“ ist Geld, das du gespart hast. Was du damit machst, entscheidest du gleich darunter.";
+  return "Bisher liegst du unter deinem Budget. Weiter so!";
+}
+function restMsg(c,M){
+  if(c.rest==null)return "";
+  if(c.rest===0)return "Diesen Monat gibt es keinen Rest zu verteilen.";
+  if(N0(M.rueck)>0&&M.rIdx==null)return "Wähle noch aus, in welche Rücklage das Geld soll.";
+  if(c.nv===0)return "Alles verteilt, super! Überweise den Betrag jetzt auch wirklich, dann ist dein Sparen echt.";
+  if(c.nv<0)return "Du hast mehr verteilt, als übrig ist. Bitte prüfe die Beträge.";
+  return "Empfehlung: Lege den Rest zuerst aufs Sparkonto oder in eine Rücklage. Dann wird dein Sparen echt.";
+}
+function fehlMsg(c,M){
+  if(c.fehl==null)return "";
+  if(c.fehl===0)return "Diesen Monat gibt es keinen Fehlbetrag.";
+  if(M.fehl==="Ja")return "Der Fehlbetrag wird im nächsten Monat automatisch vom Budget abgezogen.";
+  if(M.fehl==="Nein")return "Der Fehlbetrag wird nicht übernommen. Der nächste Monat startet normal.";
+  return "Bitte wähle Ja oder Nein.";
+}
+function monthsSaved(asOf){
+  if(!S.sb)return 0;
+  const [y0,m0]=S.sb.split("-").map(Number);
+  const d=asOf||{y:new Date().getFullYear(),m:new Date().getMonth()+1};
+  return Math.max(0,(d.y-y0)*12+d.m-m0+1);
+}
+function rStand(i,asOf){
+  const r=S.r[i];
+  const pm=r.k==null?0:r.k/12;
+  const ex=S.extra.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.b),0);
+  const mon=S.m.reduce((a,M)=>a+((M.rIdx===i)?N0(M.rueck):0),0);
+  const ent=S.kaeufe.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.b),0);
+  return {pm,ms:monthsSaved(asOf),ex,mon,ent,stand:r2(N0(r.s)+pm*monthsSaved(asOf)+ex+mon-ent)};
+}
+
+/* ---------- Views ---------- */
+const V={},P={};
+V.start=()=>`
+<h2>Monatsflash Budget-Starter</h2>
+<p class="sub">Dein Geld im Blick, in vier einfachen Schritten. Ohne Stress und ohne Verzicht.</p>
+<div class="card"><b>Schritt 1 · 30 Tage beobachten.</b><br>Trage jede Woche im Tab „Monat“ ein, wie viel du in jedem Topf ausgegeben hast (Summe aus deinen Kassenbons oder dem Kontoauszug). Mehr nicht. Das Budget bleibt noch leer. Du lernst nur kennen, wohin dein Geld wirklich fließt.</div>
+<div class="card"><b>Schritt 2 · Budget festlegen.</b><br>Nach 1 bis 2 Monaten kennst du deinen Durchschnitt. Trage ihn im Tab „Budget“ ein und lege deine Obergrenzen fest. Das Wochenbudget (Monatsbudget ÷ 4) rechnet sich von selbst. Im Tab „Monat“ siehst du dann sofort, wo du stehst.</div>
+<div class="card"><b>Schritt 3 · Rücklagen bilden.</b><br>Große, unregelmäßige Ausgaben (TÜV, Weihnachten, Urlaub, Kleidergröße) sparst du in kleinen Raten im Voraus an. Der Tab „Rücklagen“ rechnet dir aus, wie viel du pro Monat zurücklegen musst und wie viel schon da ist.</div>
+<div class="card"><b>Schritt 4 · Jahresabschluss.</b><br>Im Tab „Jahr“ siehst du, was du ausgegeben und wie viel du gespart hast: aufs Sparkonto, in Rücklagen und pro Topf.</div>
+<h3>Was bedeuten die Farben?</h3>
+<div class="card"><div class="row"><div style="flex:0 0 90px"><input class="num" value="Gelb" readonly style="text-align:center"></div><div class="hint" style="flex:1">Hier schreibst du etwas hinein.</div></div>
+<div class="row" style="margin-top:8px"><div style="flex:0 0 90px" class="calc">Grau</div><div class="hint" style="flex:1">Das rechnet sich von selbst. Hier musst du nichts tun.</div></div></div>
+<h3>Ein Beispiel</h3>
+<div class="card"><b>Einkauf.</b> In Woche 1 warst du dreimal einkaufen: 38,50 € + 12,90 € + 9,40 €. Das macht 60,80 €. Diese Summe schreibst du bei „Lebensmittel & Getränke“ in „Woche 1“.</div>
+<div class="card"><b>Rücklage.</b> Das Auto braucht im Jahr ungefähr 900 € (TÜV, Inspektion, Reifen). 900 € ÷ 12 = 75 €. Du legst also jeden Monat 75 € per Dauerauftrag auf ein eigenes Konto zurück. Wird der TÜV fällig, zahlst du von dort und dein Monatsbudget bleibt unberührt.</div>
+<h3>Was gehört wohin?</h3>
+<div class="card"><b>Alltag.</b> Ins Monatsbudget gehört nur, was du regelmäßig im Alltag brauchst: Essen, Drogerie, Kind, Tanken, Tierfutter, Außer Haus und Freizeit.</div>
+<div class="card"><b>Alles andere.</b> Kleidung, Reparaturen, Möbel, Geschenke, Urlaub und andere größere Anschaffungen laufen über die Rücklagen.</div>
+<div class="msg">Dein erstes Ziel: einen Monat durchhalten. Das ist schon ein riesiger Schritt.</div>
+<div class="card"><div class="lab">Dein Jahr</div><input class="num" inputmode="numeric" data-p="jahr" data-ty="n" value="${S.jahr}"><div class="hint">Es erscheint in den Überschriften und bestimmt, welches Jahr du führst.</div></div>
+<p class="hint">Deine Daten bleiben nur auf diesem Gerät. Über das Menü (⋯ oben rechts) kannst du eine Sicherung speichern.</p>`;
+
+V.budget=()=>`
+<h2>Mein Budget</h2>
+<p class="sub">Lege nach 1 bis 2 Monaten fest, wie viel du pro Monat in jedem Topf ausgeben möchtest. Tipp: Nimm deinen Durchschnitt als Ausgangspunkt und setze die Grenze etwas darunter, aber so, dass du dich nicht knebelst.</p>
+${S.t.map((t,i)=>`<div class="card">
+<div class="lab">Topf</div>${tin(`t.${i}.n`,t.n,'style="font-weight:700"')}
+<div class="lab">Was gehört hinein?</div>${tin(`t.${i}.h`,t.h,'style="font-size:13px"')}
+<div class="grid2"><div><div class="lab">Durchschnitt der letzten Monate</div>${nin(`t.${i}.avg`,t.avg)}</div>
+<div><div class="lab">Mein Monatsbudget</div>${nin(`t.${i}.b`,t.b)}</div></div>
+<div class="lab">Pro Woche (Monatsbudget ÷ 4)</div><div class="calc" id="bw-${i}"></div></div>`).join("")}
+<div class="card soft"><div class="row"><b>Zusammen</b></div>
+<div class="grid2"><div><div class="lab">Durchschnitt</div><div class="calc" id="bta"></div></div><div><div class="lab">Monatsbudget</div><div class="calc" id="btb"></div></div></div>
+<div class="lab">Pro Woche</div><div class="calc" id="btw"></div></div>
+<p class="hint">Hast du kein Kind oder kein Tier? Lass die Zeile einfach leer. Brauchst du etwas anderes, nutze die „Eigenen Töpfe“ und gib ihnen einen Namen. Die Namen erscheinen automatisch überall. Alles, was hier nicht steht (Kleidung, Reparaturen, Urlaub …), gehört in die Rücklagen.</p>`;
+P.budget=()=>{
+  S.t.forEach((t,i)=>{$("#bw-"+i).textContent=t.b==null?"":eur0(t.b/4);});
+  const sa=S.t.reduce((a,t)=>a+N0(t.avg),0), sb=S.t.reduce((a,t)=>a+N0(t.b),0);
+  $("#bta").textContent=eur(r2(sa));$("#btb").textContent=eur(r2(sb));$("#btw").textContent=sb?eur0(sb/4):"";
+};
+
+V.monat=()=>{
+  const M=S.m[UI.m];
+  const chips=MON.map((n,i)=>`<button data-mon="${i}" class="${i===UI.m?"on":""}">${n}</button>`).join("");
+  const cards=S.t.map((t,i)=>`<div class="card">
+<div class="row"><span class="name">${esc(t.n)}</span><span class="badge" id="st-${i}"></span></div>
+<div class="weeks">${[0,1,2,3,4].map(k=>`<div><label>Woche ${k+1}</label>${nin(`m.${UI.m}.w.${i}.${k}`,M.w[i][k],`data-wk="1" data-i="${i}"`)}</div>`).join("")}</div>
+<div class="stats"><div>Summe<b id="sum-${i}"></b></div><div>Budget<b id="bud-${i}"></b></div><div>Noch übrig<b id="left-${i}"></b></div></div></div>`).join("");
+  const ru=S.r.map((r,i)=>`<option value="${i}" ${M.rIdx===i?"selected":""}>${esc(r.n)}</option>`).join("");
+  return `<h2>${MONL[UI.m]} ${S.jahr}</h2>
+<p class="sub">Trage am Ende jeder Woche die Summe pro Topf ein. Rest und Ampel rechnen sich von selbst. Ein Wochenfeld wird rot, wenn du in dieser Woche mehr ausgegeben hast, als dein Wochenbudget erlaubt. Das gleicht sich über den Monat oft wieder aus.</p>
+<div class="chips" id="chips">${chips}</div>
+${cards}
+<div class="card soft">
+<div class="row"><b>Alle Töpfe zusammen</b></div>
+<div class="stats"><div>Summe<b id="tsum"></b></div><div>Budget<b id="tbud"></b></div><div>Noch übrig<b id="tleft"></b></div></div>
+<div class="lab">± Übertrag aus dem Vormonat</div>
+${UI.m===0?`<div class="hint">Nur bei Übertrag aus dem Vorjahr</div>${nin("m.0.ueb",M.ueb)}`:`<div class="calc" id="ueb"></div><div class="hint">Kommt automatisch aus dem Vormonat.</div>`}
+</div>
+<div class="msg" id="msg"></div>
+<h3>Was machst du mit dem Rest?</h3>
+<p class="hint">Fülle das am Monatsende aus. Unsere Empfehlung: erst sparen, dann den Rest verplanen. Am Ende von Woche 5 (bei 4 Wochen eine 0 eintragen) zeigt die Ampel „Toll gemacht!“.</p>
+<div class="card">
+<div class="row"><span>Restbetrag dieses Monats</span><b id="rest"></b></div>
+<div class="lab">→ aufs Sparkonto überweisen</div>${nin(`m.${UI.m}.spar`,M.spar)}
+<div class="lab">→ in eine Rücklage legen</div>
+<div class="grid2">${nin(`m.${UI.m}.rueck`,M.rueck)}<select data-p="m.${UI.m}.rIdx" data-ty="s"><option value="">Welche Rücklage?</option>${ru}</select></div>
+<div class="hint">Der Betrag wird in den Rücklagen automatisch eingetragen.</div>
+<div class="lab">→ in den nächsten Monat</div>${nin(`m.${UI.m}.naechst`,M.naechst)}
+<div class="row" style="margin-top:8px"><span>Noch nicht verteilt</span><b id="nv"></b></div></div>
+<div class="msg" id="restmsg"></div>
+<h3>Mehr ausgegeben als geplant?</h3>
+<div class="card">
+<div class="row"><span>Fehlbetrag dieses Monats</span><b id="fehl"></b></div>
+<div class="lab">Minus in den nächsten Monat?</div>
+<select data-p="m.${UI.m}.fehl" data-ty="s"><option value="">Bitte wählen</option><option ${M.fehl==="Ja"?"selected":""}>Ja</option><option ${M.fehl==="Nein"?"selected":""}>Nein</option></select>
+<div class="hint">Ja = der Fehlbetrag wird im nächsten Monat vom Budget abgezogen. Nein = der nächste Monat startet normal.</div></div>
+<div class="msg" id="fehlmsg"></div>`;
+};
+P.monat=()=>{
+  const M=S.m[UI.m], c=calcMonth(UI.m);
+  c.rows.forEach((r,i)=>{
+    $("#sum-"+i).textContent=eur(r.sum);
+    $("#bud-"+i).textContent=r.bud==null?"–":eur(r.bud);
+    const l=$("#left-"+i); l.textContent=r.left==null?"–":eur0(r.left); l.className=r.left!=null&&r.left<0?"neg":"";
+    const b=$("#st-"+i); b.textContent=r.st; b.className="badge "+({"ok":"b-ok","knapp":"b-knapp","drüber":"b-drueber","Toll gemacht!":"b-toll"}[r.st]||"");
+  });
+  $$("[data-wk]").forEach(el=>{const i=+el.dataset.i, v=parseNum(el.value), wk=c.rows[i].wk; el.classList.toggle("over",wk!=null&&v!=null&&v>wk);});
+  $("#tsum").textContent=eur(c.tSum);$("#tbud").textContent=eur(c.tBud);
+  const tl=$("#tleft"); tl.textContent=c.J==null?"–":eur0(c.J); tl.className=c.J!=null&&c.J<0?"neg":"";
+  if(UI.m>0)$("#ueb").textContent=eur0(c.ueb);
+  $("#msg").textContent=monthMsg(c);
+  $("#rest").textContent=c.rest==null?"–":eur0(c.rest);
+  $("#nv").textContent=c.nv==null?"–":eur0(c.nv);
+  $("#restmsg").textContent=restMsg(c,M);$("#restmsg").style.display=c.rest==null?"none":"";
+  $("#fehl").textContent=c.fehl==null?"–":eur0(c.fehl);
+  $("#fehlmsg").textContent=fehlMsg(c,M);$("#fehlmsg").style.display=c.fehl==null?"none":"";
+};
+
+V.rueck=()=>`
+<h2>Rücklagen</h2>
+<p class="sub">Große Ausgaben stressfrei vorbereiten: Jahreskosten ÷ 12 = dein Sparbetrag pro Monat.</p>
+<div class="card"><div class="lab">Sparbeginn (Monat, in dem dein Dauerauftrag zum ersten Mal läuft)</div><input type="month" data-p="sb" data-ty="t" value="${esc(S.sb||"")}"></div>
+${S.r.map((r,i)=>`<div class="card">
+${tin(`r.${i}.n`,r.n,'style="font-weight:700"')}
+${tin(`r.${i}.h`,r.h,'style="font-size:13px;margin-top:6px" placeholder="Wofür? (Beispiele)"')}
+<div class="grid2"><div><div class="lab">Geschätzte Kosten pro Jahr</div>${nin(`r.${i}.k`,r.k)}</div>
+<div><div class="lab">Schon gespart (Startstand)</div>${nin(`r.${i}.s`,r.s)}</div></div>
+<div class="stats"><div>Pro Monat<b id="rpm-${i}"></b></div><div>Monate gespart<b id="rms-${i}"></b></div><div>Stand jetzt<b id="rst-${i}"></b></div></div>
+<div class="bar" style="margin-top:8px"><i id="rbar-${i}"></i></div>
+<div class="hint" id="rinfo-${i}"></div></div>`).join("")}
+<div class="card soft"><div class="grid2"><div><div class="lab">Kosten pro Jahr</div><div class="calc" id="rtk"></div></div><div><div class="lab">Stand jetzt</div><div class="calc" id="rts"></div></div></div>
+<div class="lab">Dein Dauerauftrag pro Monat aufs Rücklagenkonto</div><div class="calc" id="rtp" style="font-size:20px;color:var(--acc)"></div>
+<div class="hint">Richte ihn am Monatsanfang ein, gleich nach Geldeingang, auf ein eigenes Tagesgeld- oder Unterkonto. Der „Stand jetzt“ ist ein Soll-Stand. Schau ab und zu, ob er zu deinem Kontostand passt.</div></div>
+<h3>Käufe aus der Rücklage</h3>
+<p class="hint">Kaufst du etwas, das zu einer Rücklage gehört, trägst du es hier ein. Es wird automatisch von der Rücklage abgezogen und nicht vom Monatsbudget.</p>
+<div id="listK"></div><button class="btn sec" data-add="kaeufe">+ Kauf eintragen</button>
+<h3>Extra eingezahlt</h3>
+<p class="hint">Überweist du zusätzlich zum Dauerauftrag Geld aufs Rücklagenkonto (zum Beispiel Geldgeschenke), trägst du es hier ein. Monatsreste aus dem Tab „Monat“ kommen automatisch hinein.</p>
+<div id="listE"></div><button class="btn sec" data-add="extra">+ Einzahlung eintragen</button>`;
+function listHtml(kind){
+  const L=S[kind]; const opts=sel=>S.r.map((r,i)=>`<option value="${i}" ${sel===i?"selected":""}>${esc(r.n)}</option>`).join("");
+  if(!L.length)return `<div class="hint" style="margin:6px 0">Noch nichts eingetragen.</div>`;
+  return L.map((e,j)=>`<div class="card"><div class="row"><select data-p="${kind}.${j}.r" data-ty="si" style="flex:1"><option value="">Rücklage wählen</option>${opts(e.r)}</select><button class="x" data-del="${kind}.${j}" aria-label="Löschen">✕</button></div>
+<div class="grid2"><div><div class="lab">${kind==="kaeufe"?"Wofür?":"Woher?"}</div>${tin(`${kind}.${j}.w`,e.w)}</div><div><div class="lab">Datum</div><input type="date" data-p="${kind}.${j}.d" data-ty="t" value="${esc(e.d||"")}"></div></div>
+<div class="lab">Betrag</div>${nin(`${kind}.${j}.b`,e.b)}</div>`).join("");
+}
+P.rueck=()=>{
+  if(!$("#listK").dataset.ok){$("#listK").innerHTML=listHtml("kaeufe");$("#listE").innerHTML=listHtml("extra");$("#listK").dataset.ok=1;}
+  let tk=0,ts=0,tp=0;
+  S.r.forEach((r,i)=>{
+    const x=rStand(i); tk+=N0(r.k);ts+=x.stand;tp+=x.pm;
+    $("#rpm-"+i).textContent=r.k==null?"–":eur0(x.pm);
+    $("#rms-"+i).textContent=x.ms;
+    const st=$("#rst-"+i); st.textContent=eur0(x.stand); st.className=x.stand<0?"neg":"";
+    $("#rbar-"+i).style.width=(N0(r.k)>0?Math.min(1,Math.max(0,x.stand/r.k))*100:0)+"%";
+    const parts=[];if(x.mon)parts.push("aus Monatsresten "+eur0(r2(x.mon)));if(x.ex)parts.push("extra "+eur0(r2(x.ex)));if(x.ent)parts.push("entnommen "+eur0(r2(x.ent)));
+    $("#rinfo-"+i).textContent=parts.join(" · ");
+  });
+  $("#rtk").textContent=eur(r2(tk));$("#rts").textContent=eur(r2(ts));$("#rtp").textContent=eur(r2(tp));
+};
+
+V.jahr=()=>{
+  const C=MON.map((_,i)=>calcMonth(i));
+  const act=C.filter(c=>c.active).length;
+  const ausg=r2(C.reduce((a,c)=>a+c.tSum,0));
+  const spar=r2(S.m.reduce((a,M)=>a+N0(M.spar),0)), rue=r2(S.m.reduce((a,M)=>a+N0(M.rueck),0));
+  const gespart=r2(spar+rue);
+  const bud=r2(C.filter(c=>c.active).reduce((a,c)=>a+c.tBud,0));
+  const nvT=r2(C.reduce((a,c)=>a+(c.active&&c.nv!=null?c.nv:0),0));
+  const ml=C.map((c,i)=>{const M=S.m[i];return `<tr><td>${MONL[i]}</td><td>${eur(c.tSum)}</td><td>${c.active?eur(c.tBud):""}</td><td class="${c.J<0?"neg":""}">${c.active&&c.J!=null?eur0(c.J):""}</td><td>${eur(N0(M.spar))}</td><td>${eur(N0(M.rueck))}</td><td>${eur(c.carryOut)}</td><td>${c.active&&c.nv!=null?eur(c.nv):""}</td></tr>`;}).join("");
+  const tr=S.t.map((t,i)=>{
+    const a=r2(C.reduce((s,c)=>s+c.rows[i].sum,0));
+    const b=r2(C.filter(c=>c.active).reduce((s,c)=>s+N0(c.rows[i].bud),0));
+    const d=b===0?null:r2(b-a);
+    return {t,a,b,d,avg:act?a/act:null,row:C.map(c=>c.rows[i].sum)};
+  });
+  const rows2=tr.map(x=>`<tr><td>${esc(x.t.n)}</td><td>${eur(x.a)}</td><td>${eur(x.b)}</td><td class="${x.d!=null&&x.d<0?"neg":""}">${x.d==null?"":eur0(x.d)}</td><td>${x.avg==null?"":eur(r2(x.avg))}</td></tr>`).join("");
+  const grid=tr.map(x=>`<tr><td>${esc(x.t.n)}</td>${x.row.map(v=>`<td>${eur(v)}</td>`).join("")}<td><b>${eur(x.a)}</b></td></tr>`).join("");
+  const gt=`<tr class="tot"><td>Zusammen</td>${C.map(c=>`<td>${eur(c.tSum)}</td>`).join("")}<td>${eur(ausg)}</td></tr>`;
+  const rk=S.r.map((r,i)=>{const x=rStand(i);return `<tr><td>${esc(r.n)}</td><td>${eur(N0(r.k))}</td><td>${eur(r2(x.pm))}</td><td>${eur(r2(x.ent))}</td><td class="${x.stand<0?"neg":""}">${eur(x.stand)}</td></tr>`;}).join("");
+  const rt=S.r.reduce((a,r,i)=>{const x=rStand(i);a.k+=N0(r.k);a.p+=x.pm;a.e+=x.ent;a.s+=x.stand;return a;},{k:0,p:0,e:0,s:0});
+  return `<h2>Mein Jahresabschluss ${S.jahr}</h2>
+<p class="sub">Hier läuft alles zusammen. Das rechnet sich von selbst aus deinen Monaten.</p>
+<div class="tiles">
+<div class="tile"><b>${eur(ausg)}</b><span>Ausgegeben im Jahr</span></div>
+<div class="tile"><b>${act}</b><span>Monate mit Einträgen</span></div>
+<div class="tile"><b>${act?eur(r2(ausg/act)):"–"}</b><span>Ø Ausgaben pro Monat</span></div>
+<div class="tile"><b>${eur(spar)}</b><span>Aufs Sparkonto überwiesen</span></div>
+<div class="tile"><b>${eur(rue)}</b><span>In Rücklagen gelegt</span></div>
+<div class="tile"><b>${eur(gespart)}</b><span>Aktiv gespart insgesamt</span></div></div>
+<div class="msg">${gespart>0?"Super: Du hast in diesem Jahr aktiv Geld zur Seite gelegt. Das darfst du feiern!":"Trage in den Monatsblättern ein, was du mit dem Rest machst. Dann siehst du hier dein Erspartes."}</div>
+<h3>Monat für Monat</h3>
+<div class="scroll"><table><tr><th>Monat</th><th>Ausgegeben</th><th>Budget</th><th>Noch übrig</th><th>Sparkonto</th><th>Rücklagen</th><th>Übertrag</th><th>Nicht verteilt</th></tr>${ml}
+<tr class="tot"><td>Zusammen</td><td>${eur(ausg)}</td><td>${eur(bud)}</td><td></td><td>${eur(spar)}</td><td>${eur(rue)}</td><td></td><td>${eur(nvT)}</td></tr></table></div>
+<p class="hint">„Noch übrig“ und „Übertrag“ werden nicht addiert, weil ein Übertrag sonst doppelt zählen würde.</p>
+<h3>Wohin ist das Geld gegangen?</h3>
+<div class="scroll"><table><tr><th>Topf</th><th>Ausgegeben</th><th>Budget</th><th>Unterschied</th><th>Ø/Monat</th></tr>${rows2}
+<tr class="tot"><td>Zusammen</td><td>${eur(ausg)}</td><td>${eur(bud)}</td><td></td><td>${act?eur(r2(ausg/act)):""}</td></tr></table></div>
+<h3>Topf für Topf, Monat für Monat</h3>
+<div class="scroll"><table><tr><th>Topf</th>${MON.map(m=>`<th>${m}</th>`).join("")}<th>Jahr</th></tr>${grid}${gt}</table></div>
+<h3>Meine Rücklagen</h3>
+<div class="scroll"><table><tr><th>Rücklage</th><th>Kosten/Jahr</th><th>Pro Monat</th><th>Entnommen</th><th>Stand</th></tr>${rk}
+<tr class="tot"><td>Zusammen</td><td>${eur(r2(rt.k))}</td><td>${eur(r2(rt.p))}</td><td>${eur(r2(rt.e))}</td><td>${eur(r2(rt.s))}</td></tr></table></div>`;
+};
+
+/* ---------- Steuerung ---------- */
+function setPath(path,val){
+  const k=path.split("."); let o=S;
+  for(let i=0;i<k.length-1;i++)o=o[k[i]];
+  o[k[k.length-1]]=val;
+}
+function render(){
+  $("#main").innerHTML=V[UI.v]();
+  $$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===UI.v));
+  paint();
+}
+function paint(){ if(P[UI.v])P[UI.v](); }
+function go(v){UI.v=v;render();window.scrollTo(0,0);}
+document.addEventListener("input",e=>{
+  const el=e.target; if(!el.dataset||!el.dataset.p)return;
+  const ty=el.dataset.ty; let val;
+  if(ty==="n")val=parseNum(el.value);
+  else if(ty==="si")val=el.value===""?null:+el.value;
+  else if(ty==="s"&&el.dataset.p.endsWith("rIdx"))val=el.value===""?null:+el.value;
+  else val=el.value;
+  if(el.dataset.p==="jahr"){ if(val==null||val<2000||val>2100)return; }
+  setPath(el.dataset.p,val); save(); paint();
+});
+document.addEventListener("change",e=>{
+  const el=e.target; if(el.dataset&&el.dataset.p==="jahr")render();
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  if(b.dataset.v){go(b.dataset.v);return;}
+  if(b.dataset.mon!=null){UI.m=+b.dataset.mon;render();return;}
+  if(b.dataset.add){
+    S[b.dataset.add].push({r:null,w:"",d:new Date().toISOString().slice(0,10),b:null});
+    save(); const k=b.dataset.add; $(k==="kaeufe"?"#listK":"#listE").innerHTML=listHtml(k); paint(); return;
+  }
+  if(b.dataset.del){
+    const [k,j]=b.dataset.del.split("."); S[k].splice(+j,1); save();
+    $(k==="kaeufe"?"#listK":"#listE").innerHTML=listHtml(k); paint(); return;
+  }
+});
+/* Menü */
+const menu=$("#menu");
+$("#menuBtn").onclick=()=>menu.classList.add("on");
+$("#mClose").onclick=()=>menu.classList.remove("on");
+menu.addEventListener("click",e=>{if(e.target===menu)menu.classList.remove("on");});
+function exportData(){
+  const blob=new Blob([JSON.stringify(S)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="budget-starter-sicherung-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+$("#mExport").onclick=exportData;
+$("#mImport").onclick=()=>$("#file").click();
+$("#file").onchange=ev=>{
+  const f=ev.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{const d=JSON.parse(rd.result); if(!(d&&d.v===1&&d.t&&d.m&&d.r))throw 0;
+      if(!confirm("Deine aktuellen Daten werden durch die Sicherung ersetzt. Fortfahren?"))return;
+      S=d; save(); menu.classList.remove("on"); render();
+    }catch(e){alert("Diese Datei ist keine gültige Sicherung.");}
+  };
+  rd.readAsText(f); ev.target.value="";
+};
+$("#mPrint").onclick=()=>{menu.classList.remove("on");window.print();};
+$("#mReset").onclick=()=>{
+  if(!confirm("Wirklich ALLE Daten löschen? Das kannst du nicht rückgängig machen. Speichere vorher eine Sicherung."))return;
+  S=freshState(); save(); menu.classList.remove("on"); go("start");
+};
+$("#mNew").onclick=()=>{
+  if(!confirm("Neues Jahr beginnen? Eine Sicherung des alten Jahres wird gespeichert. Dein Budget und deine Rücklagen-Stände werden übernommen, die Monate beginnen leer. Ein offener Übertrag aus Dezember wandert in den Januar."))return;
+  exportData();
+  const y=S.jahr, asOf={y:y,m:12};
+  const stands=S.r.map((_,i)=>rStand(i,asOf).stand);
+  const dec=carry(11);
+  S.r.forEach((r,i)=>{r.s=r2(stands[i]);});
+  S.sb=(y+1)+"-01"; S.kaeufe=[]; S.extra=[]; S.jahr=y+1;
+  S.m=freshState().m; S.m[0].ueb=dec||null;
+  UI.m=0; save(); menu.classList.remove("on"); go("monat");
+};
+render();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>
