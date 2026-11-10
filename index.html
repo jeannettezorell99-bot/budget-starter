@@ -112,8 +112,10 @@ const RUECK=[
 ["Kind","Autositz, nächste Kleidergröße, Fahrrad"],
 ["Feste & Geschenke","Weihnachten, Geburtstage"],
 ["Urlaub","Sommerurlaub"],
-["Haus & Gesundheit","Reparaturen, Brille, Zuzahlungen"],
-["Eigene Rücklage 1",""],["Eigene Rücklage 2",""],["Eigene Rücklage 3",""]];
+["Haus","Reparaturen, Möbel, Renovieren, Geräte"],
+["Gesundheit","Brille, Zahnarzt, Zuzahlungen, Medikamente"],
+["Kleidung","Kleidung und Schuhe für alle"],
+["Eigene Rücklage 1",""],["Eigene Rücklage 2",""],["Eigene Rücklage 3",""],["Eigene Rücklage 4",""],["Eigene Rücklage 5",""]];
 const NT=TOEPFE.length, NR=RUECK.length;
 
 function freshState(){
@@ -126,8 +128,20 @@ function freshState(){
 }
 let S=load();
 function load(){
-  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1&&s.t&&s.m)return s;}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1&&s.t&&s.m){migrate(s);return s;}}catch(e){}
   return freshState();
+}
+function migrate(s){
+  // Alt: "Haus & Gesundheit" in "Haus" und "Gesundheit" teilen, auf 12 Rücklagen erweitern
+  if(s.r.length===8&&s.r[4].n==="Haus & Gesundheit"){
+    const sh=i=>(i!=null&&i>=5)?i+2:i;
+    s.r[4].n="Haus"; s.r[4].h="Reparaturen, Möbel, Renovieren, Geräte";
+    s.r.splice(5,0,{n:"Gesundheit",h:"Brille, Zahnarzt, Zuzahlungen, Medikamente",k:null,s:null});
+    s.r.splice(6,0,{n:"Kleidung",h:"Kleidung und Schuhe für alle",k:null,s:null});
+    (s.kaeufe||[]).forEach(e=>e.r=sh(e.r)); (s.extra||[]).forEach(e=>e.r=sh(e.r)); s.m.forEach(M=>M.rIdx=sh(M.rIdx));
+  }
+  const fresh=freshState();
+  while(s.r.length<12){const k=s.r.length;s.r.push({n:fresh.r[k]?fresh.r[k].n:"Eigene Rücklage "+(k-6),h:fresh.r[k]?fresh.r[k].h:"",k:null,s:null});}
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 let UI={v:"start",m:(()=>{const d=new Date();return d.getFullYear()===S.jahr?d.getMonth():0;})()};
@@ -319,6 +333,7 @@ ${tin(`r.${i}.h`,r.h,'style="font-size:13px;margin-top:6px" placeholder="Wofür?
 <div class="card soft"><div class="grid2"><div><div class="lab">Kosten pro Jahr</div><div class="calc" id="rtk"></div></div><div><div class="lab">Stand jetzt</div><div class="calc" id="rts"></div></div></div>
 <div class="lab">Dein Dauerauftrag pro Monat aufs Rücklagenkonto</div><div class="calc" id="rtp" style="font-size:20px;color:var(--acc)"></div>
 <div class="hint">Richte ihn am Monatsanfang ein, gleich nach Geldeingang, auf ein eigenes Tagesgeld- oder Unterkonto. Der „Stand jetzt“ ist ein Soll-Stand. Schau ab und zu, ob er zu deinem Kontostand passt.</div></div>
+<button class="btn sec" data-addr="1">+ Weitere Rücklage</button>
 <h3>Käufe aus der Rücklage</h3>
 <p class="hint">Kaufst du etwas, das zu einer Rücklage gehört, trägst du es hier ein. Es wird automatisch von der Rücklage abgezogen und nicht vom Monatsbudget.</p>
 <div id="listK"></div><button class="btn sec" data-add="kaeufe">+ Kauf eintragen</button>
@@ -421,6 +436,7 @@ document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
   if(b.dataset.v){go(b.dataset.v);return;}
   if(b.dataset.mon!=null){UI.m=+b.dataset.mon;render();return;}
+  if(b.dataset.addr){S.r.push({n:"Eigene Rücklage "+(S.r.length-6),h:"",k:null,s:null});save();render();return;}
   if(b.dataset.add){
     S[b.dataset.add].push({r:null,w:"",d:new Date().toISOString().slice(0,10),b:null});
     save(); const k=b.dataset.add; $(k==="kaeufe"?"#listK":"#listE").innerHTML=listHtml(k); paint(); return;
