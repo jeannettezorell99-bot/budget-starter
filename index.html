@@ -69,6 +69,24 @@ tr.tot td{font-weight:700;background:var(--grey)}
 .menu div{background:#fff;margin:60px 16px 0 auto;max-width:320px;border-radius:12px;padding:12px;display:grid;gap:8px}
 .x{border:0;background:transparent;color:var(--red);font-size:20px}
 ol{padding-left:20px}
+.wc{font-size:13px;padding:8px 2px;text-align:center;min-height:38px;font-weight:600}
+.wc.over{background:var(--redbg);color:#8a1c14}
+.scanbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.scanbtns .btn{padding:12px 8px}
+textarea{font:inherit;width:100%;min-height:120px;border:1px solid var(--line);border-radius:8px;padding:8px}
+.pos{border-top:1px solid var(--line);padding:8px 0}
+.pos:first-child{border-top:0}
+.pos.unsure{background:#fff8e1;border-radius:8px;padding:8px}
+.pos .r1{display:flex;gap:6px}
+.pos .r1 input:first-child{flex:1}
+.pos .r1 input:last-child{width:96px;text-align:right}
+details.bon{border:1px solid var(--line);border-radius:10px;margin:6px 0;background:#fff}
+details.bon summary{padding:10px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.erow{display:flex;justify-content:space-between;gap:8px;padding:6px 10px;border-top:1px solid var(--line);font-size:14px;align-items:center}
+.erow small{color:var(--mut);display:block}
+.ok{color:#1b5e20}.err{color:var(--red)}
+.chk{font-weight:700;margin:8px 0}.chk.err{color:var(--red)}
+nav button{font-size:11px}
 @media print{header,nav,.chips,.btn{display:none}body{padding:0}}
 </style>
 </head>
@@ -78,11 +96,13 @@ ol{padding-left:20px}
 <nav id="nav">
 <button data-v="start"><span>🏠</span>Start</button>
 <button data-v="budget"><span>🎯</span>Budget</button>
+<button data-v="erfassen"><span>🧾</span>Erfassen</button>
 <button data-v="monat"><span>📅</span>Monat</button>
 <button data-v="rueck"><span>🐷</span>Rücklagen</button>
 <button data-v="jahr"><span>📊</span>Jahr</button>
 </nav>
 <div class="menu" id="menu"><div>
+<div><div class="lab">Freischaltcode</div><input class="txt" id="codeIn" placeholder="Code eingeben" autocomplete="off" autocapitalize="characters"><button class="btn sec" id="mCode" style="width:100%;margin-top:6px">Freischalten</button><div class="hint" id="codeMsg"></div></div>
 <button class="btn sec" id="mExport">Sicherung speichern</button>
 <button class="btn sec" id="mImport">Sicherung laden</button>
 <button class="btn sec" id="mPrint">Seite drucken</button>
@@ -91,6 +111,159 @@ ol{padding-left:20px}
 <button class="btn" id="mClose">Schließen</button>
 <input type="file" id="file" accept=".json,application/json" style="display:none">
 </div></div>
+<script>
+var SBDATA={"kat":[["Lebensmittel","Obst",1],["Lebensmittel","Gemüse & Kartoffeln",1],["Lebensmittel","Brot & Backwaren",1],["Lebensmittel","Milch & Sahne",1],["Lebensmittel","Joghurt & Quark",1],["Lebensmittel","Käse & Frischkäse",1],["Lebensmittel","Butter & Margarine",1],["Lebensmittel","Eier",1],["Lebensmittel","Fleisch & Geflügel",1],["Lebensmittel","Wurst & Aufschnitt",1],["Lebensmittel","Fisch & Meeresfrüchte",1],["Lebensmittel","Nudeln, Reis & Getreide",1],["Lebensmittel","Mehl & Backzutaten",1],["Lebensmittel","Müsli & Cerealien",1],["Lebensmittel","Konserven & Eingelegtes",1],["Lebensmittel","Hülsenfrüchte",1],["Lebensmittel","Soßen, Gewürze & Öle",1],["Lebensmittel","Aufstriche",1],["Lebensmittel","Süßes & Snacks",1],["Lebensmittel","Nüsse & Trockenfrüchte",1],["Lebensmittel","Tiefkühlkost",1],["Lebensmittel","Fertiggerichte",1],["Lebensmittel","Eis & Dessert",1],["Lebensmittel","Vegetarisch & Vegan",1],["Getränke","Wasser & Saft",1],["Getränke","Softdrinks & Energy",1],["Getränke","Kaffee",1],["Getränke","Tee",1],["Getränke","Bier",1],["Getränke","Wein & Sekt",1],["Getränke","Spirituosen",1],["Getränke","Pfand",1],["Haushalt & Reinigung","Putz- & Reinigungsmittel",1],["Haushalt & Reinigung","Waschmittel & Wäschepflege",1],["Haushalt & Reinigung","Spülmittel & Geschirrspülen",1],["Haushalt & Reinigung","Küche & Frischhaltung",1],["Haushalt & Reinigung","Papier & Müllbeutel",1],["Haushalt & Reinigung","Haushaltswaren",1],["Haushalt & Reinigung","Deko",1],["Drogerie, Körperpflege & Hygiene","Damenhygiene",1],["Drogerie, Körperpflege & Hygiene","Inkontinenz",1],["Drogerie, Körperpflege & Hygiene","Zahn- & Mundpflege",1],["Drogerie, Körperpflege & Hygiene","Haut, Haar & Körper",1],["Drogerie, Körperpflege & Hygiene","Rasur",1],["Drogerie, Körperpflege & Hygiene","Kosmetik",1],["Gesundheit & Apotheke","Medikamente & Apotheke",1],["Gesundheit & Apotheke","Vitamine & Nahrungsergänzung",1],["Gesundheit & Apotheke","Verbandmaterial & Erste Hilfe",1],["Gesundheit & Apotheke","Brille & Hilfsmittel",1],["Gesundheit & Apotheke","Arzt & Zuzahlungen",1],["Baby & Kind","Windeln & Babypflege",1],["Baby & Kind","Babynahrung",1],["Baby & Kind","Spielzeug",1],["Baby & Kind","Schul- & Bastelbedarf",1],["Baby & Kind","Schule",1],["Baby & Kind","Kindergarten",1],["Baby & Kind","Kinderbetreuung",1],["Haustier","Tierfutter",1],["Haus & Garten","Garten & Pflanzen",1],["Haus & Garten","Baumarkt & Werkzeug",1],["Haus & Garten","Renovieren & Farbe",1],["Haus & Garten","Möbel & Einrichtung",1],["Haus & Garten","Haushaltsgeräte",1],["Auto & Mobilität","Tanken (Fahrzeug 1)",0],["Auto & Mobilität","Tanken (Fahrzeug 2)",0],["Auto & Mobilität","Werkstatt & Reparatur",0],["Auto & Mobilität","Parken & Maut",0],["Kleidung & Schuhe","Kleidung",0],["Kleidung & Schuhe","Schuhe",0],["Kleidung & Schuhe","Accessoires & Schmuck",0],["Freizeit & Hobby","Sport & Fitness",0],["Freizeit & Hobby","Hobby & Basteln",0],["Freizeit & Hobby","Ausflüge & Freizeit",0],["Freizeit & Hobby","Kultur & Veranstaltungen",0],["Freizeit & Hobby","Vereine & Beiträge",0],["Freizeit & Hobby","Spaßgeld",0],["Außer Haus","Restaurant & Lieferdienst",0],["Außer Haus","Café & Bäcker unterwegs",0],["Außer Haus","Kantine & Imbiss",0],["Außer Haus","Kaffeegeld",0],["Nicht zugeordnet","Nicht zugeordnet – bitte prüfen",0]],"such":[[18,"m&m"],[27,"tee"],[30,"rum"],[42,"deo"],[46,"q10"],[63,"e10"],[0,"kiwi"],[1,"kohl"],[2,"brot"],[2,"wrap"],[4,"skyr"],[5,"brie"],[5,"feta"],[5,"buko"],[7,"eier"],[8,"ente"],[8,"rind"],[8,"lamm"],[8,"hack"],[12,"mehl"],[12,"hefe"],[13,"chia"],[16,"senf"],[16,"mayo"],[16,"fond"],[16,"salz"],[16,"zimt"],[18,"mars"],[18,"twix"],[18,"keks"],[19,"nuss"],[19,"nuts"],[19,"goji"],[23,"tofu"],[23,"soja"],[24,"saft"],[25,"cola"],[25,"frio"],[26,"cafe"],[27,"chai"],[28,"bier"],[28,"pils"],[29,"wein"],[29,"rosé"],[29,"sekt"],[29,"cava"],[34,"pril"],[38,"vase"],[38,"deko"],[39,"o.b."],[42,"kamm"],[42,"dove"],[42,"taft"],[44,"duft"],[45,"wick"],[46,"zink"],[47,"ffp2"],[47,"tape"],[49,"arzt"],[49,"igel"],[51,"hipp"],[52,"lego"],[53,"heft"],[58,"erde"],[59,"holz"],[60,"lack"],[60,"gips"],[60,"putz"],[61,"sofa"],[61,"bett"],[61,"ikea"],[61,"pouf"],[0,"apfel"],[0,"birne"],[0,"mango"],[0,"feige"],[1,"gurke"],[1,"salat"],[1,"lauch"],[1,"pilze"],[2,"toast"],[2,"burli"],[2,"donut"],[2,"broet"],[3,"milch"],[3,"kakao"],[3,"shake"],[3,"sahne"],[4,"quark"],[4,"kefir"],[5,"kaese"],[5,"gouda"],[5,"miree"],[5,"crois"],[6,"becel"],[8,"puten"],[8,"steak"],[8,"leber"],[9,"wurst"],[9,"bacon"],[9,"speck"],[10,"fisch"],[10,"lachs"],[11,"nudel"],[11,"penne"],[11,"rigat"],[11,"hirse"],[16,"essig"],[16,"aceto"],[16,"pesto"],[16,"sosse"],[16,"sauce"],[16,"knorr"],[16,"maggi"],[16,"curry"],[17,"honig"],[17,"gelee"],[17,"humus"],[17,"sirup"],[18,"milka"],[18,"kekse"],[18,"chips"],[18,"flips"],[18,"bueno"],[18,"duplo"],[19,"sesam"],[20,"pizza"],[21,"suppe"],[21,"kloss"],[21,"sushi"],[23,"vegan"],[25,"pepsi"],[25,"fanta"],[25,"spezi"],[25,"tonic"],[25,"fritz"],[25,"mezzo"],[26,"latte"],[27,"teek."],[29,"secco"],[30,"wodka"],[30,"vodka"],[31,"pfand"],[31,"leerg"],[33,"ariel"],[33,"lenor"],[34,"fairy"],[34,"somat"],[36,"tempo"],[38,"kerze"],[37,"decke"],[37,"nadel"],[41,"elmex"],[42,"seife"],[42,"watte"],[42,"nivea"],[42,"syoss"],[44,"puder"],[44,"rouge"],[44,"kajal"],[71,"fotos"],[45,"salbe"],[46,"eisen"],[47,"maske"],[52,"puppe"],[52,"tonie"],[53,"hefte"],[53,"wolle"],[53,"pappe"],[57,"felix"],[57,"sheba"],[58,"samen"],[58,"rasen"],[58,"harke"],[58,"mulch"],[58,"grill"],[58,"rosen"],[59,"saege"],[59,"zange"],[59,"nagel"],[59,"haken"],[59,"kabel"],[59,"acryl"],[59,"feile"],[60,"farbe"],[60,"lasur"],[60,"vinyl"],[61,"regal"],[61,"tisch"],[61,"stuhl"],[61,"couch"],[61,"lampe"],[61,"rollo"],[0,"aepfel"],[0,"banane"],[0,"orange"],[0,"traube"],[0,"melone"],[0,"beeren"],[0,"papaya"],[0,"pomelo"],[1,"tomate"],[1,"moehre"],[1,"spinat"],[1,"rucola"],[1,"porree"],[1,"ingwer"],[2,"brezel"],[2,"laugen"],[2,"buerli"],[2,"kuchen"],[2,"semmel"],[2,"weckle"],[2,"gipfel"],[2,"muffin"],[2,"broet."],[4,"jogurt"],[5,"edamer"],[5,"bresso"],[6,"butter"],[8,"rinder"],[8,"braten"],[8,"huefte"],[9,"salami"],[9,"lyoner"],[9,"wiener"],[9,"rostbr"],[9,"suelze"],[10,"hering"],[10,"matjes"],[10,"surimi"],[10,"dorade"],[10,"zander"],[11,"nudeln"],[11,"delver"],[11,"jasmin"],[11,"bulgur"],[11,"quinoa"],[11,"griess"],[11,"dinkel"],[12,"natron"],[12,"zucker"],[12,"stevia"],[13,"muesli"],[13,"smacks"],[14,"kidney"],[14,"ananas"],[14,"oliven"],[14,"kapern"],[15,"linsen"],[16,"bruehe"],[16,"muskat"],[16,"cheesy"],[17,"hummus"],[18,"schoko"],[18,"riegel"],[18,"bounty"],[18,"haribo"],[18,"bonbon"],[18,"hanuta"],[19,"nuesse"],[19,"cashew"],[19,"mandel"],[19,"ueltje"],[20,"pommes"],[20,"roesti"],[20,"doener"],[20,"frosta"],[22,"langn."],[22,"capico"],[22,"magnum"],[22,"sorbet"],[22,"mousse"],[23,"tempeh"],[23,"seitan"],[23,"veggie"],[23,"vegane"],[23,"beyond"],[24,"wasser"],[24,"nektar"],[24,"quelle"],[25,"sprite"],[25,"eistee"],[25,"energy"],[25,"brause"],[26,"kaffee"],[26,"jacobs"],[26,"tchibo"],[27,"matcha"],[28,"weizen"],[28,"helles"],[28,"radler"],[28,"export"],[28,"shandy"],[28,"pils 0"],[29,"merlot"],[29,"winzer"],[30,"whisky"],[30,"likoer"],[30,"aperol"],[30,"cognac"],[30,"grappa"],[32,"cillit"],[33,"persil"],[33,"vanish"],[34,"finish"],[36,"muellb"],[38,"kerzen"],[37,"tasche"],[37,"schere"],[37,"stifte"],[39,"tampon"],[39,"binden"],[39,"always"],[41,"mundsp"],[41,"corega"],[42,"dusche"],[44,"makeup"],[44,"parfum"],[45,"rezept"],[45,"fieber"],[45,"arznei"],[46,"biotin"],[47,"masken"],[48,"brille"],[49,"praxis"],[49,"physio"],[50,"windel"],[50,"sauger"],[51,"milupa"],[51,"humana"],[52,"puzzle"],[52,"barbie"],[53,"lineal"],[53,"zirkel"],[53,"perlen"],[53,"karton"],[53,"ordner"],[53,"pinsel"],[57,"chappi"],[57,"purina"],[57,"frolic"],[58,"spaten"],[58,"rechen"],[59,"hammer"],[59,"bohrer"],[59,"naegel"],[59,"duebel"],[59,"winkel"],[59,"leiter"],[59,"latten"],[59,"zement"],[60,"tapete"],[60,"rigips"],[61,"moebel"],[61,"sessel"],[61,"kueche"],[61,"hocker"],[63,"diesel"],[63,"benzin"],[63,"tanken"],[63,"adblue"],[78,"imbiss"],[0,"zitrone"],[0,"limette"],[0,"kirsche"],[0,"pflaume"],[0,"avocado"],[1,"paprika"],[1,"zwiebel"],[1,"karotte"],[1,"rotkohl"],[1,"wirsing"],[1,"rettich"],[1,"spargel"],[1,"kuerbis"],[1,"fenchel"],[1,"mangold"],[2,"broetch"],[2,"rosenbr"],[2,"brioche"],[2,"plunder"],[3,"h-milch"],[3,"schmand"],[4,"joghurt"],[4,"pudding"],[4,"ehrmann"],[4,"dessert"],[5,"gruyère"],[5,"cheddar"],[5,"ricotta"],[8,"schwein"],[8,"gulasch"],[9,"pastete"],[10,"forelle"],[10,"makrele"],[10,"scholle"],[10,"shrimps"],[10,"krabben"],[11,"fusilli"],[11,"lumache"],[11,"ravioli"],[11,"lasagne"],[11,"spitzle"],[11,"barilla"],[11,"basmati"],[11,"risotto"],[11,"polenta"],[11,"graupen"],[12,"staerke"],[13,"cereals"],[13,"granola"],[13,"crunchy"],[14,"passata"],[16,"rapsoel"],[16,"ketchup"],[16,"tabasco"],[16,"pfeffer"],[16,"oregano"],[16,"thymian"],[16,"gewuerz"],[16,"kurkuma"],[16,"lorbeer"],[17,"nutella"],[18,"lakritz"],[18,"bonbons"],[18,"stollen"],[18,"butterk"],[18,"cookies"],[18,"waffeln"],[18,"praline"],[18,"cracker"],[18,"popcorn"],[18,"nic nac"],[18,"gebaeck"],[19,"walnuss"],[19,"mandeln"],[19,"erdnuss"],[19,"rosinen"],[19,"datteln"],[19,"nussmix"],[20,"nuggets"],[21,"maultas"],[21,"gnocchi"],[21,"eintopf"],[21,"burrito"],[21,"knoedel"],[21,"kloesse"],[22,"haeagen"],[23,"veganer"],[23,"falafel"],[23,"planted"],[24,"sprudel"],[24,"schorle"],[24,"mineral"],[25,"ice tea"],[25,"monster"],[25,"isostar"],[26,"kapseln"],[26,"prodomo"],[26,"lavazza"],[26,"melitta"],[27,"rooibos"],[27,"messmer"],[28,"pilsner"],[28,"biermix"],[29,"rotwein"],[29,"piccolo"],[30,"whiskey"],[30,"schnaps"],[30,"obstler"],[30,"tequila"],[30,"campari"],[30,"baileys"],[30,"absinth"],[31,"leergut"],[31,"mehrweg"],[32,"sidolin"],[35,"schwamm"],[38,"teppich"],[39,"tampons"],[41,"meridol"],[41,"colgate"],[42,"shampoo"],[42,"pantene"],[42,"haarkur"],[42,"haargel"],[42,"peeling"],[42,"kondome"],[42,"babyoel"],[42,"garnier"],[44,"mascara"],[44,"make-up"],[44,"parfuem"],[45,"aspirin"],[45,"imodium"],[45,"tropfen"],[45,"globuli"],[45,"mundgel"],[46,"vitamin"],[46,"calcium"],[46,"omega 3"],[46,"protein"],[46,"kreatin"],[47,"verband"],[48,"brillen"],[48,"optiker"],[48,"bandage"],[48,"orthese"],[49,"massage"],[49,"impfung"],[50,"windeln"],[50,"pampers"],[50,"babybad"],[51,"aptamil"],[51,"babytee"],[51,"beikost"],[51,"pouches"],[52,"laufrad"],[53,"fueller"],[53,"malbuch"],[53,"glitzer"],[57,"whiskas"],[57,"kitekat"],[58,"duenger"],[58,"saatgut"],[58,"pflanze"],[58,"unkraut"],[58,"kompost"],[59,"bauhaus"],[59,"bohrset"],[59,"silikon"],[59,"bretter"],[59,"moertel"],[59,"stecker"],[59,"schloss"],[60,"tapeten"],[60,"fliesen"],[60,"laminat"],[60,"parkett"],[60,"rauputz"],[61,"schrank"],[61,"kommode"],[61,"spiegel"],[61,"vorhang"],[61,"gardine"],[61,"plissee"],[63,"autogas"],[30,"dry gin"],[62,"toaster"],[0,"erdbeere"],[0,"himbeere"],[0,"pfirsich"],[0,"aprikose"],[0,"obstkorb"],[1,"zucchini"],[1,"brokkoli"],[1,"broccoli"],[1,"sellerie"],[1,"kohlrabi"],[1,"klasse i"],[2,"baguette"],[2,"ciabatta"],[2,"focaccia"],[2,"tortilla"],[2,"zwieback"],[2,"berliner"],[5,"parmesan"],[5,"halloumi"],[5,"raclette"],[5,"raeucher"],[7,"bio-eier"],[7,"freiland"],[7,"eier 6er"],[8,"kotelett"],[8,"rouladen"],[9,"schinken"],[9,"teewurst"],[9,"katensch"],[9,"kasseler"],[10,"forellen"],[10,"kabeljau"],[10,"seelachs"],[10,"garnelen"],[10,"muscheln"],[10,"rollmops"],[10,"sardinen"],[11,"farfalle"],[11,"spaetzle"],[11,"couscous"],[12,"marzipan"],[12,"streusel"],[12,"gelatine"],[13,"porridge"],[16,"sesamoel"],[16,"kokosoel"],[16,"sriracha"],[16,"dressing"],[16,"kraeuter"],[18,"snickers"],[18,"baerchen"],[18,"knoppers"],[18,"pralinen"],[18,"pringles"],[18,"nikolaus"],[19,"paranuss"],[21,"sandwich"],[21,"mirácoli"],[21,"miracoli"],[22,"eiscreme"],[22,"langnese"],[22,"cornetto"],[22,"eistorte"],[22,"tiramisu"],[9,"feinkost"],[24,"smoothie"],[25,"limonade"],[25,"cold tea"],[25,"red bull"],[25,"rockstar"],[25,"malzbier"],[25,"powerade"],[26,"espresso"],[26,"dallmayr"],[27,"teekanne"],[28,"bockbier"],[29,"roséwein"],[29,"prosecco"],[29,"riesling"],[30,"amaretto"],[31,"pfandbon"],[32,"reiniger"],[32,"wc stein"],[32,"domestos"],[32,"antikalk"],[32,"rohrfrei"],[33,"waschgel"],[34,"calgonit"],[35,"alufolie"],[35,"brotdose"],[35,"backform"],[37,"batterie"],[37,"handtuch"],[37,"packband"],[37,"naehgarn"],[40,"vorlagen"],[41,"kukident"],[42,"spuelung"],[42,"duschgel"],[42,"deospray"],[42,"aftersun"],[42,"gleitgel"],[43,"rasierer"],[44,"lipgloss"],[44,"eyeliner"],[44,"kosmetik"],[44,"pinzette"],[43,"gillette"],[45,"apotheke"],[45,"allergie"],[45,"voltaren"],[46,"vitamine"],[46,"fischoel"],[46,"kollagen"],[46,"baldrian"],[47,"pflaster"],[48,"sehhilfe"],[48,"rollator"],[48,"gehhilfe"],[48,"gehstock"],[49,"zahnarzt"],[49,"hautarzt"],[49,"vorsorge"],[49,"therapie"],[51,"babybrei"],[51,"babykeks"],[52,"bobbycar"],[52,"toniebox"],[53,"malblock"],[53,"lernheft"],[53,"register"],[57,"leckerli"],[57,"kausnack"],[57,"pedigree"],[57,"dreamies"],[58,"pflanzen"],[58,"hochbeet"],[58,"lavendel"],[59,"baumarkt"],[59,"hornbach"],[59,"massband"],[59,"schraube"],[59,"werkzeug"],[59,"fittings"],[59,"dichtung"],[59,"zylinder"],[60,"kleister"],[60,"spachtel"],[60,"abbeizer"],[60,"buntlack"],[61,"esstisch"],[61,"matratze"],[61,"jalousie"],[61,"sitzsack"],[61,"wohnwand"],[40,"tena men"],[0,"mandarine"],[0,"brombeere"],[0,"nektarine"],[0,"zwetschge"],[1,"knoblauch"],[1,"aubergine"],[1,"weisskohl"],[1,"feldsalat"],[1,"kartoffel"],[1,"rote bete"],[1,"rosenkohl"],[2,"broetchen"],[2,"croissant"],[2,"hamburger"],[3,"vollmilch"],[3,"sojamilch"],[3,"kochsahne"],[3,"cremefine"],[4,"milchreis"],[4,"almighurt"],[5,"camembert"],[5,"bergkaese"],[5,"limburger"],[5,"handkaese"],[6,"margarine"],[7,"eier 10er"],[8,"haehnchen"],[8,"huehnchen"],[8,"brathaehn"],[8,"gehacktes"],[8,"schnitzel"],[9,"mettwurst"],[9,"bockwurst"],[9,"cabanossi"],[9,"gelbwurst"],[10,"pangasius"],[11,"spaghetti"],[12,"backaroma"],[12,"backkakao"],[13,"cerealien"],[13,"leinsamen"],[13,"flohsamen"],[14,"mais dose"],[14,"thunfisch"],[14,"obstsalat"],[14,"kirschpap"],[14,"nocellara"],[14,"eingelegt"],[14,"antipasti"],[14,"sardellen"],[16,"olivenoel"],[16,"speiseoel"],[16,"balsamico"],[16,"remoulade"],[16,"sojasosse"],[16,"sojasauce"],[16,"worcester"],[17,"marmelade"],[18,"chocolate"],[18,"kaubonbon"],[18,"lebkuchen"],[18,"osterhase"],[18,"raffaello"],[18,"yogurette"],[19,"walnuesse"],[19,"haselnuss"],[19,"pistazien"],[19,"erdnuesse"],[19,"macadamia"],[19,"pekannuss"],[20,"tiefkuehl"],[20,"kroketten"],[20,"backfisch"],[20,"beeren tk"],[21,"flammkuch"],[21,"pizzateig"],[22,"speiseeis"],[22,"schokoeis"],[22,"wassereis"],[22,"eisbecher"],[24,"apfelsaft"],[25,"coca-cola"],[25,"mezzo mix"],[25,"schweppes"],[25,"club mate"],[25,"iso sport"],[27,"teebeutel"],[28,"weissbier"],[28,"malz bier"],[28,"bitburger"],[28,"oettinger"],[28,"weissgold"],[29,"weisswein"],[29,"gluehwein"],[29,"lemberger"],[29,"primitivo"],[30,"weinbrand"],[32,"entkalker"],[32,"raumspray"],[32,"duftspray"],[33,"waschtabs"],[33,"waschpods"],[33,"gallseife"],[33,"flecksalz"],[34,"spueltabs"],[35,"spueltuch"],[35,"organizer"],[35,"holzkohle"],[36,"klopapier"],[36,"muellsack"],[38,"duftkerze"],[37,"batterien"],[37,"led lampe"],[37,"badematte"],[37,"klebeband"],[37,"notizbuch"],[37,"papier a4"],[37,"reparatur"],[37,"py tasche"],[41,"zahnpasta"],[41,"zahnseide"],[41,"listerine"],[41,"taft zahn"],[41,"zahncreme"],[42,"haarspray"],[42,"haarfarbe"],[42,"haarwachs"],[42,"handseife"],[42,"handcreme"],[42,"wattepads"],[42,"deodorant"],[42,"deoroller"],[42,"fusscreme"],[42,"haargummi"],[43,"rasiergel"],[43,"epilierer"],[44,"nagellack"],[44,"concealer"],[43,"wilkinson"],[45,"ibuprofen"],[45,"wundsalbe"],[45,"heilsalbe"],[45,"cetirizin"],[45,"durchfall"],[45,"zuzahlung"],[45,"tabletten"],[45,"zaepfchen"],[45,"gel sport"],[45,"bepanthen"],[46,"vitamin d"],[46,"vitamin c"],[46,"vitamin b"],[46,"magnesium"],[46,"folsaeure"],[46,"melatonin"],[47,"mullbinde"],[47,"kuehlpack"],[49,"osteopath"],[49,"augenarzt"],[50,"babycreme"],[50,"babypuder"],[50,"schnuller"],[50,"beissring"],[50,"laetzchen"],[50,"spucktuch"],[50,"body baby"],[50,"strampler"],[51,"milchbrei"],[51,"babymilch"],[51,"glaeschen"],[51,"quetschie"],[51,"kindertee"],[51,"hirsebrei"],[51,"babykekse"],[52,"spielzeug"],[52,"playmobil"],[52,"knetmasse"],[52,"hoerspiel"],[53,"schulheft"],[53,"bleistift"],[53,"anspitzer"],[53,"maeppchen"],[53,"tonpapier"],[53,"moosgummi"],[53,"bastelset"],[53,"schulbuch"],[53,"malkasten"],[58,"setzlinge"],[58,"uebertopf"],[59,"schrauben"],[59,"dichtband"],[59,"dachlatte"],[59,"sperrholz"],[59,"steckdose"],[59,"sicherung"],[59,"scharnier"],[59,"tuergriff"],[60,"wandfarbe"],[60,"holzlasur"],[60,"kreppband"],[60,"farbwanne"],[60,"farbeimer"],[60,"lackspray"],[61,"stehlampe"],[61,"garderobe"],[61,"vorhaenge"],[61,"wandregal"],[61,"sideboard"],[61,"tv moebel"],[63,"super e10"],[30,"gin tonic"],[40,"tena lady"],[0,"clementine"],[0,"grapefruit"],[1,"salatgurke"],[1,"blumenkohl"],[1,"radieschen"],[1,"champignon"],[1,"petersilie"],[1,"gemuesemix"],[2,"dinkelbrot"],[2,"fladenbrot"],[2,"dink buerl"],[3,"hafermilch"],[3,"haferdrink"],[3,"milchdrink"],[3,"milchshake"],[4,"griessbrei"],[4,"magerquark"],[5,"mozzarella"],[5,"emmentaler"],[5,"reibekaese"],[5,"mascarpone"],[5,"leerdammer"],[5,"gorgonzola"],[8,"putenbrust"],[8,"frikadelle"],[8,"spare ribs"],[9,"leberwurst"],[9,"leberkaese"],[9,"mortadella"],[9,"wuerstchen"],[9,"aufschnitt"],[9,"landjaeger"],[11,"maccheroni"],[11,"tortellini"],[11,"backerbsen"],[11,"eiernudeln"],[11,"reisnudeln"],[11,"glasnudeln"],[12,"weizenmehl"],[12,"dinkelmehl"],[12,"backpulver"],[12,"rohrzucker"],[12,"kuvertuere"],[12,"tortenguss"],[12,"paniermehl"],[12,"zuckerguss"],[12,"suessstoff"],[12,"honig lose"],[13,"cornflakes"],[13,"kornflakes"],[13,"cini minis"],[14,"sauerkraut"],[14,"cornichons"],[16,"mayonnaise"],[16,"grillsosse"],[16,"currysosse"],[16,"pastasosse"],[17,"konfituere"],[17,"ahornsirup"],[18,"schokolade"],[18,"weihnachts"],[18,"plaetzchen"],[18,"schokokeks"],[20,"rahmspinat"],[20,"strudel tk"],[20,"eiswuerfel"],[21,"dosensuppe"],[21,"tortelloni"],[21,"fixprodukt"],[22,"cremissimo"],[22,"magnum eis"],[22,"vanilleeis"],[9,"delikatess"],[24,"heilwasser"],[24,"direktsaft"],[24,"fruchtsaft"],[25,"ginger ale"],[25,"lipton ice"],[26,"cappuccino"],[26,"kaffeepads"],[27,"schwarztee"],[27,"fencheltee"],[28,"craft beer"],[28,"krombacher"],[28,"weiss-gold"],[29,"champagner"],[29,"trollinger"],[29,"chardonnay"],[30,"eierlikoer"],[30,"spirituose"],[31,"leergutbon"],[32,"putzmittel"],[35,"frischebox"],[35,"backpapier"],[35,"topflappen"],[35,"messbecher"],[35,"kuchenform"],[35,"teelichter"],[35,"strohhalme"],[35,"pappteller"],[35,"grillkohle"],[36,"servietten"],[37,"gluehbirne"],[37,"kopfkissen"],[38,"dekoration"],[37,"briefmarke"],[38,"blumenvase"],[37,"beutel o&g"],[37,"obstbeutel"],[39,"intimspray"],[39,"ob tampons"],[41,"mundwasser"],[42,"bodylotion"],[42,"bodybutter"],[42,"tagescreme"],[42,"nachtcreme"],[42,"badezusatz"],[42,"badeschaum"],[42,"massageoel"],[42,"koerperoel"],[43,"enthaarung"],[44,"foundation"],[44,"nagelfeile"],[32,"ungeziefer"],[45,"nasenspray"],[45,"hustensaft"],[45,"erkaeltung"],[45,"grippostad"],[45,"brandsalbe"],[45,"sodbrennen"],[45,"medikament"],[45,"thomapyrin"],[46,"probiotika"],[46,"l-carnitin"],[47,"kompressen"],[47,"kaeltepack"],[47,"mundschutz"],[47,"covid test"],[48,"lesebrille"],[48,"hoergeraet"],[49,"zahnersatz"],[50,"pants baby"],[50,"milchpumpe"],[50,"babysocken"],[50,"mullwindel"],[51,"folgemilch"],[51,"quetschies"],[51,"kinderkeks"],[51,"baby snack"],[52,"baukloetze"],[52,"brettspiel"],[52,"rutschauto"],[52,"spielfigur"],[52,"kinderbuch"],[52,"bilderbuch"],[53,"buntstifte"],[53,"filzstifte"],[53,"wachsmaler"],[53,"geodreieck"],[53,"federmappe"],[53,"textmarker"],[53,"klebestift"],[53,"schultuete"],[57,"tierfutter"],[57,"nassfutter"],[57,"kauknochen"],[57,"vogelsamen"],[57,"katzengras"],[58,"blumenerde"],[58,"pflanzerde"],[58,"rasensamen"],[58,"blumentopf"],[58,"giesskanne"],[58,"gartenerde"],[58,"gartenzaun"],[59,"fugenmasse"],[59,"schubkarre"],[59,"staubmaske"],[59,"wasserhahn"],[60,"farbroller"],[60,"malerrolle"],[60,"abdeckband"],[60,"malerkrepp"],[60,"bodenbelag"],[60,"rostschutz"],[60,"holzschutz"],[60,"wandschutz"],[60,"spruehlack"],[61,"couchtisch"],[61,"lattenrost"],[61,"nachttisch"],[61,"buerostuhl"],[61,"tischlampe"],[61,"schuhregal"],[61,"sitzkissen"],[61,"raumteiler"],[63,"super plus"],[78,"currywurst"],[30,"london dry"],[30,"doppelkorn"],[38,"tischdecke"],[11,"jasminreis"],[62,"mikrowelle"],[79,"kaffeegeld"],[0,"weintrauben"],[0,"heidelbeere"],[0,"granatapfel"],[1,"mais frisch"],[2,"buttertoast"],[2,"knaeckebrot"],[2,"kaese-crois"],[3,"frischmilch"],[3,"buttermilch"],[3,"mandelmilch"],[3,"schlagsahne"],[3,"saure sahne"],[3,"kaffeesahne"],[4,"speisequark"],[5,"appenzeller"],[5,"hirtenkaese"],[5,"frischkaese"],[5,"schafskaese"],[5,"ziegenkaese"],[6,"streichfett"],[8,"rindfleisch"],[8,"hackfleisch"],[8,"nackensteak"],[9,"rohschinken"],[10,"tintenfisch"],[11,"tagliatelle"],[12,"trockenhefe"],[12,"puderzucker"],[12,"braunzucker"],[12,"kakaopulver"],[14,"tomatenmark"],[14,"linsen dose"],[14,"bohnen dose"],[14,"essiggurken"],[14,"gurken glas"],[14,"pfefferonen"],[14,"peperoncini"],[15,"rote linsen"],[16,"meerrettich"],[16,"chilipulver"],[16,"essigessenz"],[17,"nuss-nougat"],[17,"nougatcreme"],[17,"schokocreme"],[18,"fruchtgummi"],[18,"spekulatius"],[18,"chipsfrisch"],[18,"funnyfrisch"],[18,"salzstangen"],[18,"reiswaffeln"],[18,"marshmallow"],[18,"hanuta 10er"],[19,"haselnuesse"],[19,"erdnusskern"],[19,"cranberries"],[19,"pinienkerne"],[21,"maultaschen"],[21,"flammkuchen"],[21,"tuetensuppe"],[21,"fertigsalat"],[21,"salat to go"],[21,"reisgericht"],[21,"wok gericht"],[22,"ben & jerry"],[22,"panna cotta"],[23,"sojajoghurt"],[23,"vegetarisch"],[24,"quellwasser"],[24,"orangensaft"],[24,"traubensaft"],[24,"gemuesesaft"],[24,"tomatensaft"],[24,"kokoswasser"],[25,"energydrink"],[26,"caro kaffee"],[27,"fruechtetee"],[27,"kraeutertee"],[27,"gruener tee"],[27,"kamillentee"],[28,"kasten bier"],[28,"clausthaler"],[29,"weinschorle"],[29,"weinflasche"],[32,"badreiniger"],[32,"wc reiniger"],[32,"wc-reiniger"],[33,"waschmittel"],[33,"waschpulver"],[33,"waescheduft"],[34,"spuelmittel"],[34,"klarspueler"],[35,"gefrierdose"],[35,"vorratsdose"],[35,"kuehltasche"],[35,"kuechentuch"],[35,"partybecher"],[35,"zahnstocher"],[36,"muellbeutel"],[36,"muellsaecke"],[36,"zugbandsack"],[37,"tragetasche"],[37,"bettwaesche"],[37,"kissenbezug"],[37,"vitaminnetz"],[39,"damenbinden"],[39,"slipeinlage"],[39,"intimpflege"],[40,"inkontinenz"],[41,"zahnbuerste"],[41,"blend-a-med"],[42,"abschminken"],[42,"sonnencreme"],[42,"sonnenmilch"],[42,"nagelpflege"],[42,"haarbuerste"],[42,"schwarzkopf"],[44,"lidschatten"],[44,"lippenstift"],[44,"nagelschere"],[71,"fotoservice"],[47,"zeckenzange"],[45,"paracetamol"],[45,"kopfschmerz"],[45,"halsschmerz"],[45,"verstopfung"],[45,"zahnschmerz"],[46,"elektrolyte"],[47,"wundauflage"],[47,"thermometer"],[47,"erste hilfe"],[47,"schnelltest"],[47,"corona test"],[47,"kinesiotape"],[48,"brillenglas"],[48,"hoergeraete"],[48,"orthopaedie"],[49,"krankenhaus"],[49,"eigenanteil"],[50,"babywindeln"],[50,"babyshampoo"],[50,"windeleimer"],[50,"mullwindeln"],[50,"babyflasche"],[50,"flaeschchen"],[50,"babytuecher"],[51,"babynahrung"],[51,"pre nahrung"],[51,"pre-nahrung"],[52,"kartenspiel"],[52,"plueschtier"],[52,"kuscheltier"],[52,"spielkarten"],[52,"kinderspiel"],[53,"schulranzen"],[53,"radiergummi"],[53,"sportbeutel"],[57,"hundefutter"],[57,"futter hund"],[57,"katzensnack"],[57,"katzenmilch"],[57,"vogelfutter"],[57,"hasenfutter"],[57,"fischfutter"],[57,"tiernahrung"],[57,"nagerfutter"],[57,"hundekuchen"],[58,"blumensamen"],[58,"topfpflanze"],[58,"rasenmaeher"],[58,"rindenmulch"],[58,"gartenstuhl"],[58,"gartentisch"],[58,"gartenlaube"],[59,"wasserwaage"],[59,"kabelbinder"],[59,"isolierband"],[59,"trittleiter"],[60,"grundierung"],[60,"tiefengrund"],[60,"abdeckfolie"],[60,"silikon bad"],[78,"ausser haus"],[78,"pommes bude"],[11,"basmatireis"],[11,"risottoreis"],[62,"staubsauger"],[62,"buegeleisen"],[0,"wassermelone"],[1,"spitzpaprika"],[1,"lauchzwiebel"],[1,"eisbergsalat"],[1,"schnittlauch"],[2,"golden toast"],[2,"laugenbrezel"],[2,"vollkornbrot"],[2,"kekse frisch"],[3,"kondensmilch"],[4,"naturjoghurt"],[5,"grana padano"],[5,"schnittkaese"],[5,"philadelphia"],[5,"schmelzkaese"],[7,"freilandeier"],[7,"bodenhaltung"],[8,"huehnerbrust"],[8,"burger patty"],[8,"rinderhuefte"],[9,"kochschinken"],[9,"bierschinken"],[9,"fleischwurst"],[12,"vollkornmehl"],[12,"backmischung"],[14,"dosentomaten"],[14,"kichererbsen"],[14,"rotkohl glas"],[14,"honigpaprika"],[14,"artischocken"],[15,"sojagranulat"],[15,"belugalinsen"],[16,"tomatensosse"],[16,"suppenwuerze"],[16,"kreuzkuemmel"],[17,"streichcreme"],[18,"kinder bueno"],[18,"ritter sport"],[18,"dominosteine"],[18,"celebrations"],[18,"funny frisch"],[18,"erdnussflips"],[18,"brezel snack"],[18,"muesliriegel"],[18,"zimtschnecke"],[18,"prinzenrolle"],[19,"kuerbiskerne"],[21,"nudelgericht"],[21,"ravioli dose"],[22,"eis am stiel"],[23,"haferjoghurt"],[24,"multivitamin"],[24,"apfelschorle"],[25,"bitter lemon"],[26,"kaffeebohnen"],[26,"bohnenkaffee"],[26,"filterkaffee"],[26,"kaffeefilter"],[26,"filtertueten"],[27,"active wildb"],[29,"federweisser"],[30,"mix getraenk"],[31,"einweg pfand"],[31,"pfandautomat"],[31,"kasten pfand"],[32,"glasreiniger"],[32,"scheuermilch"],[32,"kalkreiniger"],[32,"desinfektion"],[33,"weichspueler"],[35,"frischeboxen"],[35,"topfreiniger"],[35,"spuelschwamm"],[35,"geschirrtuch"],[35,"kerzenhalter"],[36,"kuechenrolle"],[36,"knotenbeutel"],[36,"abfallbeutel"],[36,"kosmetiktuch"],[37,"leuchtmittel"],[37,"duschvorhang"],[38,"bilderrahmen"],[39,"slipeinlagen"],[41,"mundspuelung"],[42,"haarspuelung"],[42,"lippenpflege"],[42,"lippenbalsam"],[42,"sonnenschutz"],[42,"haarklammern"],[42,"pflegelotion"],[43,"rasierschaum"],[43,"rasierwasser"],[44,"nagelknipser"],[32,"mottenschutz"],[37,"lufttrockner"],[45,"nasentropfen"],[45,"hustenloeser"],[45,"hustenbonbon"],[45,"augentropfen"],[45,"ohrentropfen"],[45,"lippenherpes"],[46,"aminosaeuren"],[46,"mariendistel"],[47,"wundpflaster"],[47,"heftpflaster"],[47,"waermflasche"],[47,"teststreifen"],[50,"stoffwindeln"],[51,"anfangsmilch"],[51,"folgenahrung"],[51,"getreidebrei"],[51,"fruchtpueree"],[52,"seifenblasen"],[52,"kinderzimmer"],[53,"collegeblock"],[53,"tintenroller"],[53,"bastelpapier"],[53,"wasserfarben"],[53,"bastelkleber"],[53,"buegelperlen"],[53,"zeichenblock"],[57,"katzenfutter"],[57,"futter katze"],[57,"pferdefutter"],[58,"rasenduenger"],[58,"gemuesesamen"],[58,"kraeutertopf"],[58,"jungpflanzen"],[58,"pflanzkuebel"],[58,"heckenschere"],[58,"gartenschere"],[58,"sonnenschirm"],[58,"blumenkasten"],[59,"bohrmaschine"],[59,"schutzbrille"],[59,"gehoerschutz"],[60,"fugenmoertel"],[60,"teppichboden"],[61,"schreibtisch"],[61,"einbaukueche"],[61,"bilderleiste"],[61,"buecherregal"],[61,"schuhschrank"],[61,"regaleinsatz"],[20,"pizza salami"],[20,"pizza hawaii"],[11,"langkornreis"],[11,"rundkornreis"],[11,"vollkornreis"],[62,"wasserkocher"],[0,"ananas frisch"],[1,"cocktailrispe"],[1,"bohnen frisch"],[1,"erbsen frisch"],[3,"crème fraîche"],[4,"fruchtjoghurt"],[5,"scheibenkaese"],[5,"kaesescheiben"],[6,"butterschmalz"],[8,"brathaehnchen"],[8,"hack gemischt"],[8,"schweinefilet"],[8,"schweinebauch"],[9,"katenschinken"],[10,"raeucherfisch"],[12,"speisestaerke"],[12,"vanillezucker"],[12,"vanillepulver"],[12,"schokotropfen"],[12,"semmelbroesel"],[13,"knuspermuesli"],[14,"gewuerzgurken"],[14,"honey peppers"],[14,"maiskoelbchen"],[16,"salatdressing"],[16,"gemuesebruehe"],[16,"paprikapulver"],[16,"wuerzmischung"],[17,"erdnussbutter"],[17,"brotaufstrich"],[18,"kinder riegel"],[18,"kinder schoko"],[18,"gummibaerchen"],[18,"pfirsichringe"],[20,"fischfilet tk"],[20,"gemuesepfanne"],[21,"fertiggericht"],[21,"instantnudeln"],[23,"fleischersatz"],[24,"mineralwasser"],[24,"zitr.+vitamin"],[25,"sportgetraenk"],[26,"instantkaffee"],[26,"kaffeekapseln"],[26,"kakao instant"],[27,"eistee pulver"],[30,"jaegermeister"],[32,"bodenreiniger"],[32,"moebelpolitur"],[35,"gefrierbeutel"],[35,"einwegbesteck"],[36,"kuechenpapier"],[36,"zugbandbeutel"],[36,"kompostbeutel"],[36,"hygienepapier"],[36,"feuchttuecher"],[36,"papiertuecher"],[37,"kleiderbuegel"],[37,"mehrwegtasche"],[39,"monatshygiene"],[39,"lady einlagen"],[39,"stilleinlagen"],[42,"fluessigseife"],[42,"koerperlotion"],[42,"gesichtscreme"],[43,"rasierklingen"],[43,"wachsstreifen"],[44,"wimperntusche"],[44,"eau de parfum"],[43,"haarentferner"],[32,"insektenspray"],[42,"mueckenschutz"],[45,"halstabletten"],[45,"rezeptgebuehr"],[45,"insektenstich"],[46,"proteinpulver"],[46,"eiweisspulver"],[46,"johanniskraut"],[47,"rettungsdecke"],[48,"kontaktlinsen"],[48,"schuheinlagen"],[48,"stuetzstrumpf"],[48,"sanitaetshaus"],[49,"zahnreinigung"],[49,"praxisgebuehr"],[49,"heilpraktiker"],[50,"wickelauflage"],[51,"obstquetschie"],[52,"holzspielzeug"],[52,"sandspielzeug"],[52,"roller kinder"],[53,"schere kinder"],[53,"schnellhefter"],[53,"zeichenpapier"],[57,"trockenfutter"],[57,"hundeleckerli"],[57,"gourmet katze"],[58,"blumenduenger"],[58,"zimmerpflanze"],[58,"pflanzgefaess"],[58,"schneckenkorn"],[59,"akkuschrauber"],[59,"montagekleber"],[59,"schleifpapier"],[59,"lichtschalter"],[60,"spachtelmasse"],[60,"fliesenkleber"],[60,"sockelleisten"],[61,"arbeitsplatte"],[61,"kleiderstange"],[61,"beistelltisch"],[61,"haengeschrank"],[62,"waschmaschine"],[1,"suesskartoffel"],[2,"dinkelvollkorn"],[2,"vanilla-gipfel"],[8,"haehnchenbrust"],[8,"geschnetzeltes"],[8,"brutzelfleisch"],[9,"gefluegelwurst"],[10,"fischstaebchen"],[11,"vollkornnudeln"],[12,"vanilleextrakt"],[13,"choco crossies"],[14,"tomatenstuecke"],[14,"ananasscheiben"],[14,"pfirsiche dose"],[14,"silberzwiebeln"],[15,"erbsen trocken"],[15,"bohnen trocken"],[16,"gartenkraeuter"],[17,"agavendicksaft"],[18,"tortilla chips"],[18,"fruchtschnitte"],[20,"steinofenpizza"],[20,"kartoffelecken"],[20,"blattspinat tk"],[20,"pfannengericht"],[21,"lasagne fertig"],[21,"bratkartoffeln"],[24,"mineralbrunnen"],[24,"sprudel medium"],[25,"sirup getraenk"],[27,"pfefferminztee"],[28,"schwaben braeu"],[29,"spaetburgunder"],[31,"pfandrueckgabe"],[32,"lufterfrischer"],[33,"waeschestaerke"],[33,"waescheparfuem"],[35,"dauerbackfolie"],[35,"grillanzuender"],[36,"taschentuecher"],[36,"biomuellbeutel"],[36,"hundekotbeutel"],[37,"baumwolltasche"],[37,"kugelschreiber"],[37,"geschenkpapier"],[41,"zungenreiniger"],[42,"gesichtswasser"],[42,"wattestaebchen"],[32,"insektenschutz"],[45,"magentabletten"],[45,"blasenpflaster"],[46,"eisentabletten"],[47,"waermepflaster"],[48,"brillenglaeser"],[48,"einlagen schuh"],[49,"physiotherapie"],[50,"windelhoeschen"],[52,"auto spielzeug"],[53,"tintenpatronen"],[53,"schulmaeppchen"],[58,"blumenzwiebeln"],[58,"tulpenzwiebeln"],[58,"gartenschlauch"],[58,"pflanzenschutz"],[59,"sekundenkleber"],[59,"werkzeugkasten"],[61,"kleiderschrank"],[20,"pizza speziale"],[62,"kaffeemaschine"],[1,"kuechenkraeuter"],[2,"burgerbroetchen"],[5,"kaeseaufschnitt"],[14,"mandarinen dose"],[15,"huelsenfruechte"],[16,"sonnenblumenoel"],[16,"bolognese sosse"],[16,"gewuerzmischung"],[17,"fruchtaufstrich"],[18,"studentenfutter"],[18,"schokoladenhase"],[19,"trockenfruechte"],[20,"backofen pommes"],[21,"kartoffelpueree"],[21,"chili con carne"],[24,"wittmannsthaler"],[25,"getraenkepulver"],[25,"iso sport apfel"],[25,"iso sport lemon"],[31,"pfand rueckgabe"],[32,"kuechenreiniger"],[32,"fensterreiniger"],[32,"teppichreiniger"],[33,"vollwaschmittel"],[33,"feinwaschmittel"],[34,"handspuelmittel"],[35,"frischhaltedose"],[35,"tiefkuehltasche"],[36,"toilettenpapier"],[36,"kosmetiktuecher"],[37,"briefumschlaege"],[37,"waescheklammern"],[37,"waeschestaender"],[39,"hygieneeinlagen"],[42,"reinigungsmilch"],[44,"eau de toilette"],[44,"kosmetikspiegel"],[37,"raumentfeuchter"],[37,"luftentfeuchter"],[45,"fieberzaepfchen"],[45,"lutschtabletten"],[46,"brausetabletten"],[46,"kapseln vitamin"],[47,"verbandmaterial"],[50,"wundschutzcreme"],[50,"babynagelschere"],[51,"fencheltee baby"],[52,"hoerbuch kinder"],[53,"brotdose kinder"],[57,"kaninchenfutter"],[57,"einstreu futter"],[58,"pflanzenduenger"],[59,"schraubenzieher"],[59,"schraubendreher"],[59,"klebeband stark"],[60,"tapetenkleister"],[1,"basilikum frisch"],[2,"schi-kaese-crois"],[3,"creme zum kochen"],[8,"bratwurst frisch"],[8,"fleischkaese roh"],[9,"raeucherscheiben"],[10,"thunfisch frisch"],[14,"gehackte tomaten"],[14,"champignons dose"],[16,"kraeutermischung"],[18,"kinderschokolade"],[25,"iso sport orange"],[28,"alkoholfrei bier"],[32,"allzweckreiniger"],[32,"backofenreiniger"],[32,"fleckenentferner"],[32,"geruchsentferner"],[33,"colorwaschmittel"],[35,"frischhaltefolie"],[35,"frischhaltedosen"],[36,"papierservietten"],[37,"steckdosenleiste"],[37,"sicherheitsnadel"],[37,"aufbewahrungsbox"],[39,"intimwaschlotion"],[39,"wochenbettbinden"],[41,"aufsteckbuersten"],[42,"abschminktuecher"],[42,"handdesinfektion"],[42,"haarspray p. age"],[43,"enthaarungscreme"],[44,"augenbrauenstift"],[45,"schmerztabletten"],[45,"antihistaminikum"],[47,"wunddesinfektion"],[47,"einmalhandschuhe"],[47,"elastische binde"],[49,"kieferorthopaede"],[49,"krankengymnastik"],[49,"rezept zuzahlung"],[49,"krankentransport"],[50,"brustwarzensalbe"],[50,"babycreme pflege"],[51,"reiswaffeln baby"],[57,"dosenfutter hund"],[58,"gartenhandschuhe"],[59,"vorhaengeschloss"],[60,"dispersionsfarbe"],[20,"pizza margherita"],[8,"haehnchenschenkel"],[9,"fruehstuecksspeck"],[13,"haferflocken zart"],[19,"feigen getrocknet"],[19,"sonnenblumenkerne"],[25,"iso sport zitrone"],[28,"biermischgetraenk"],[32,"schimmelentferner"],[32,"edelstahlreiniger"],[34,"geschirrspueltabs"],[34,"maschinenreiniger"],[36,"reinigungstuecher"],[36,"staubsaugerbeutel"],[40,"pants inkontinenz"],[41,"zahnputztabletten"],[41,"prothesenreiniger"],[42,"gesichtsreinigung"],[47,"fieberthermometer"],[50,"babyfeuchttuecher"],[50,"muttermilchbeutel"],[57,"dosenfutter katze"],[57,"futternapf futter"],[58,"unkrautvernichter"],[59,"handschuhe arbeit"],[59,"arbeitshandschuhe"],[16,"fruehlingskraeuter"],[20,"gemuesemischung tk"],[25,"apfelschorle suess"],[34,"spuelmaschinentabs"],[34,"spuelmaschinensalz"],[39,"menstruationstasse"],[41,"zahnstocher pflege"],[42,"nagellackentferner"],[46,"nahrungsergaenzung"],[47,"desinfektionsspray"],[48,"linsenfluessigkeit"],[50,"feuchttuecher baby"],[50,"stilleinlagen baby"],[52,"gesellschaftsspiel"],[52,"stoffbeutel kinder"],[61,"teppich wohnzimmer"],[13,"fruehstuecksflocken"],[23,"ruegenwalder veggie"],[32,"desinfektionsmittel"],[34,"geschirrspuelmittel"],[37,"verlaengerungskabel"],[37,"klebeband paketband"],[40,"inkontinenzeinlagen"],[41,"interdentalbuersten"],[47,"blutdruckmessgeraet"],[48,"hoergeraetebatterie"],[53,"trinkflasche kinder"],[57,"wellensittichfutter"],[59,"schraubenschluessel"],[2,"schinken-kaese-crois"],[4,"griechischer joghurt"],[15,"kichererbsen trocken"],[25,"iso sport grapefruit"],[39,"periodenunterwaesche"],[40,"einlagen inkontinenz"],[48,"kontaktlinsenloesung"],[48,"hoergeraetebatterien"],[6,"deutsche markenbutter"],[16,"kraeuter der provence"],[48,"kompressionsstruempfe"],[57,"meerschweinchenfutter"],[46,"multivitamin tabletten"],[36,"toilettenpapier 3-lagig"],[17,"leberwurst brotaufstrich"],[35,"kaffeemaschine entkalken"],[39,"menstruationsunterwaesche"],[47,"sicherheitsnadeln verband"]],"markt":{"wochenmarkt":"Gemüse & Kartoffeln","baeckerei":"Café & Bäcker unterwegs","metzgerei":"Fleisch & Geflügel","getraenkemarkt":"Wasser & Saft","apotheke":"Medikamente & Apotheke","tankstelle":"Tanken (Fahrzeug 1)","baumarkt":"Baumarkt & Werkzeug","gartencenter":"Garten & Pflanzen","moebelhaus":"Möbel & Einrichtung"},"nz":"Nicht zugeordnet – bitte prüfen"};
+
+/* Bon-Parser: Text eines Kassenbons -> Positionen (Netto = Brutto + Rabatt), Kategorien wie im Haushaltsbuch, Summenprüfung */
+var SBParser=(function(){
+  var D=(typeof SBDATA!=="undefined")?SBDATA:require("./data.js");
+  var KAT=D.kat, SUCH=D.such, STD=D.markt, NZ=D.nz;
+  var BEREICH={};KAT.forEach(function(k){BEREICH[k[1]]=k[0]});
+
+  // Alte Warengruppen der ersten App-Version -> neue Kategorien
+  var LEGACY={"Aufstriche":"Aufstriche","Außer Haus":"Kantine & Imbiss","Backzutaten":"Mehl & Backzutaten","Brot & Backwaren":"Brot & Backwaren","Butter":"Butter & Margarine","Cerealien":"Müsli & Cerealien","Drogerie":"Haut, Haar & Körper","Eingelegtes":"Konserven & Eingelegtes","Eis":"Eis & Dessert","Essig":"Soßen, Gewürze & Öle","Fertiggerichte":"Fertiggerichte","Fisch":"Fisch & Meeresfrüchte","Fleisch":"Fleisch & Geflügel","Frischkäse":"Käse & Frischkäse","Gemüse":"Gemüse & Kartoffeln","Getränke":"Wasser & Saft","Haushalt":"Haushaltswaren","Hülsenfrüchte":"Hülsenfrüchte","Joghurt & Quark":"Joghurt & Quark","Kaffee":"Kaffee","Käse":"Käse & Frischkäse","Konserven":"Konserven & Eingelegtes","Mehl":"Mehl & Backzutaten","Milch":"Milch & Sahne","Nudeln":"Nudeln, Reis & Getreide","Nüsse":"Nüsse & Trockenfrüchte","Obst":"Obst","Öle":"Soßen, Gewürze & Öle","Pfand":"Pfand","Reis":"Nudeln, Reis & Getreide","Sahne":"Milch & Sahne","Soßen, Gewürze & Würzmittel":"Soßen, Gewürze & Öle","Süßes & Snacks":"Süßes & Snacks","Tee":"Tee","Tiefkühl & Fertiges":"Fertiggerichte","Tiefkühl":"Tiefkühlkost","Wurst":"Wurst & Aufschnitt","Zucker":"Mehl & Backzutaten","Sonstiges":NZ};
+  function migrate(g){return BEREICH[g]?g:(LEGACY[g]||g)}
+
+  // Gleiche Normalisierung wie im Blatt „Einkäufe & Rechnungen“ (Spalte K)
+  function xnorm(s){return String(s).trim().toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")}
+  // Für gelernte Zuordnungen
+  function normKey(name){
+    return String(name).toLowerCase().replace(/[^a-zäöüß ]/g," ").split(/\s+/).filter(function(t){return t.length>1}).join(" ");
+  }
+  // Zuordnung wie in Excel: Suchwort im Artikeltext, die unterste passende Zeile gewinnt;
+  // sonst Standard-Kategorie des Geschäfts; sonst „Nicht zugeordnet“. Gelernte Korrekturen aus der App gehen vor.
+  function classify(name,markt,regeln){
+    var k=normKey(name);
+    if(regeln&&k&&regeln[k]&&BEREICH[migrate(regeln[k])])return {gruppe:migrate(regeln[k]),sicher:true,gelernt:true};
+    var x=xnorm(name);
+    for(var i=SUCH.length-1;i>=0;i--){
+      if(x.indexOf(SUCH[i][1])>=0)return {gruppe:KAT[SUCH[i][0]][1],sicher:true};
+    }
+    var s=markt&&STD[xnorm(markt)];
+    if(s)return {gruppe:s,sicher:true,standard:true};
+    return {gruppe:NZ,sicher:false};
+  }
+
+  function toNum(s){return parseFloat(String(s).replace(/\./g,function(m,o,str){return /\d{3}/.test(str.slice(o+1,o+4))&&str.indexOf(",")>-1?"":"."}).replace(",","."))}
+  function r2(n){return Math.round(n*100)/100}
+
+  var MAERKTE=[[/\blidl\b/i,"Lidl"],[/\brewe\b/i,"Rewe"],[/\bpenny\b/i,"Penny"],[/\bnorma\b/i,"Norma"],[/\bedeka\b/i,"Edeka"],[/\bnetto\b/i,"Netto"],[/\baldi\b/i,"Aldi"],[/\bkaufland\b/i,"Kaufland"],[/\brossmann\b/i,"Rossmann"],[/\bdm\b|dm-drogerie/i,"dm"]];
+
+  var RE_DISC=/^(?:\d+\s*x\s*)?(.*?(?:rabatt|preisvorteil|preiskorrekt\w*|coupon|nachlass).*?)\s*(-\s?\d{1,4},\d{2})(?:\s*[AB])?\s*\*?$/i;
+  var RE_STK=/^(\d+)\s*Stk\.?\s*[x×]\s*(\d+,\d{2})$/i;
+  var RE_KG=/^(\d+,\d{1,3})\s*kg\s*[x×]\s*(\d+,\d{2})(?:\s*EUR\s*\/\s*kg)?$/i;
+  var RE_QTY=/^(.+?)\s+(\d+,\d{2})\s*[x×]\s*(\d+)\s+(-?\d{1,4},\d{2})\s*[AB]?\s*\*?$/;
+  var RE_ITEM=/^(.+?)\s+(-?\d{1,4},\d{2})\s*[AB]?\s*\*?$/;
+  var RE_END=/^\s*(zu zahlen|summe\b|gesamtbetrag|total\b)/i;
+
+  function kiDate(x){
+    x=String(x||"").trim();var m;
+    if((m=x.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)))return m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+    if((m=x.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2})$/)))return "20"+m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+    if((m=x.match(/^(\d{4})-(\d{2})-(\d{2})$/)))return x;
+    return null;
+  }
+  // Antwort einer KI im Format "Bon-Nr.;Datum;Geschäft;Artikel;Betrag" plus Zeile "Summe laut Bon: ..."
+  function parseKi(text,regeln){
+    var lines=String(text).replace(/\r/g,"").split("\n").map(function(x){return x.trim()}).filter(function(x){return x&&x.indexOf("```")!==0});
+    var rows=[],summeBon=null;
+    lines.forEach(function(l){
+      var m=l.match(/^Summe laut (?:Bon|Rechnung|Kassenbon)\s*:?\s*(-?\d{1,5}[.,]\d{2})/i);
+      if(m){summeBon=toNum(m[1]);return}
+      var c=l.split(";");
+      if(c.length>=5){
+        var b=c[c.length-1].trim().replace(/\s|€|EUR/g,"");
+        if(/^-?\d+([.,]\d{1,2})?$/.test(b))rows.push({datum:c[1].trim(),markt:c[2].trim(),name:c.slice(3,c.length-1).join(" ").trim(),betrag:toNum(b)});
+      }
+    });
+    if(!rows.length)return null;
+    var pos=[],warn=[];
+    rows.forEach(function(r){
+      var last=pos[pos.length-1];
+      if(r.betrag<0&&/rabatt|gutschein|coupon|preisvorteil|nachlass/i.test(r.name)&&last){last.rabatt=r2(last.rabatt+r.betrag);return}
+      pos.push({name:r.name,menge:1,einheit:"Stk",einzel:r.betrag,brutto:r.betrag,rabatt:0});
+    });
+    var markt=null,datum=null;
+    rows.forEach(function(r){if(!markt&&r.markt)markt=r.markt;if(!datum)datum=kiDate(r.datum)});
+    pos.forEach(function(q){
+      q.netto=r2(q.brutto+q.rabatt);
+      var c=classify(q.name,markt,regeln);q.gruppe=c.gruppe;q.sicher=c.sicher;q.gelernt=!!c.gelernt;
+    });
+    var sum=r2(pos.reduce(function(a,q){return a+q.netto},0));
+    if(summeBon===null)warn.push("Die Zeile „Summe laut Bon“ fehlt in der Antwort, deshalb kann die Summe nicht geprüft werden.");
+    else if(Math.abs(summeBon-sum)>0.004)warn.push("Die erkannten Positionen ergeben "+sum.toFixed(2).replace(".",",")+" €, der Bon sagt "+summeBon.toFixed(2).replace(".",",")+" €. Bitte Beträge und fehlende Zeilen prüfen.");
+    if(/\[unleserlich\]/i.test(text))warn.push("Mindestens eine Zeile war unleserlich. Bitte Name und Betrag ergänzen.");
+    return {markt:markt,datum:datum,belegNr:null,summeBon:summeBon,summe:sum,positionen:pos,warnungen:warn,stimmt:summeBon!==null&&Math.abs(summeBon-sum)<=0.004};
+  }
+
+  function parseBon(text,regeln){
+    var kiRes=parseKi(text,regeln);if(kiRes)return kiRes;
+    var lines=String(text).replace(/\r/g,"").replace(/[−–—]/g,"-").split("\n").map(function(s){return s.replace(/\s+/g," ").trim()});
+    var endIdx=-1,summeBon=null;
+    for(var i=0;i<lines.length;i++){
+      if(RE_END.test(lines[i])){
+        var m=lines[i].match(/(-?\d{1,5},\d{2})\s*(?:EUR|€)?\s*$/);
+        endIdx=i;if(m)summeBon=toNum(m[1]);
+        if(m)break;
+      }
+    }
+    var body=endIdx>=0?lines.slice(0,endIdx):lines;
+    var rest=endIdx>=0?lines.slice(endIdx):[];
+    var pos=[],warn=[];
+    body.forEach(function(ln){
+      if(!ln)return;
+      var m,last=pos[pos.length-1];
+      if((m=ln.match(RE_DISC))){
+        if(last){last.rabatt=r2(last.rabatt+toNum(m[2].replace(/\s/g,"")))}else warn.push("Rabattzeile ohne Artikel: "+ln);
+        return;
+      }
+      if((m=ln.match(RE_STK))){if(last){last.menge=parseInt(m[1],10);last.einheit="Stk";last.einzel=toNum(m[2])}return}
+      if((m=ln.match(RE_KG))){if(last){last.menge=toNum(m[1]);last.einheit="kg";last.einzel=toNum(m[2])}return}
+      if((m=ln.match(RE_QTY))&&/[A-Za-zÄÖÜäöü]{2}/.test(m[1])){
+        pos.push({name:m[1].trim(),menge:parseInt(m[3],10),einheit:"Stk",einzel:toNum(m[2]),brutto:toNum(m[4]),rabatt:0});return;
+      }
+      if((m=ln.match(RE_ITEM))&&/[A-Za-zÄÖÜäöü]{2}/.test(m[1])){
+        var t=toNum(m[2]);
+        pos.push({name:m[1].trim(),menge:1,einheit:"Stk",einzel:t,brutto:t,rabatt:0});
+      }
+    });
+
+    var head=lines.slice(0,15).join("\n"),markt=null;
+    for(var j=0;j<MAERKTE.length&&!markt;j++){if(MAERKTE[j][0].test(head))markt=MAERKTE[j][1]}
+    if(!markt){for(var k=0;k<MAERKTE.length&&!markt;k++){if(MAERKTE[k][0].test(text))markt=MAERKTE[k][1]}}
+    if(!markt&&/lidl plus/i.test(text))markt="Lidl";
+
+    pos.forEach(function(p){
+      p.netto=r2(p.brutto+p.rabatt);
+      var c=classify(p.name,markt,regeln);p.gruppe=c.gruppe;p.sicher=c.sicher;p.gelernt=!!c.gelernt;
+    });
+    var sum=r2(pos.reduce(function(a,p){return a+p.netto},0));
+
+    var datum=null,after=rest.join("\n"),dm;
+    var reD=/\b(\d{2})\.(\d{2})\.(\d{4}|\d{2})\b/g;
+    [after,lines.join("\n")].some(function(src){
+      reD.lastIndex=0;
+      while((dm=reD.exec(src))){
+        var d=+dm[1],mo=+dm[2],y=dm[3].length===2?2000+ +dm[3]:+dm[3];
+        if(d>=1&&d<=31&&mo>=1&&mo<=12&&y>=2000&&y<=2100){datum=y+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");return true}
+      }
+      return false;
+    });
+
+    var bn=(text.match(/Beleg-?\s*Nr\.?:?\s*(\d+)/i)||text.match(/Bon-?\s*Nr\.?:?\s*(\d+)/i));
+    var belegNr=bn?bn[1]:null;
+
+    if(!pos.length)warn.push("Keine Positionen erkannt.");
+    if(summeBon===null)warn.push("Die Summe laut Bon wurde nicht gefunden, deshalb kann nicht geprüft werden, ob alles erkannt wurde.");
+    else if(Math.abs(summeBon-sum)>0.004)warn.push("Die erkannten Positionen ergeben "+sum.toFixed(2).replace(".",",")+" €, der Bon sagt "+summeBon.toFixed(2).replace(".",",")+" €. Bitte Beträge und fehlende Zeilen prüfen.");
+    return {markt:markt,datum:datum,belegNr:belegNr,summeBon:summeBon,summe:sum,positionen:pos,warnungen:warn,stimmt:summeBon!==null&&Math.abs(summeBon-sum)<=0.004};
+  }
+
+  return {KAT:KAT,BEREICH:BEREICH,NZ:NZ,migrate:migrate,parseBon:parseBon,classify:classify,normKey:normKey};
+})();
+
+
+</script>
 <script>
 "use strict";
 const KEY="budgetstarter.v1";
@@ -120,18 +293,30 @@ const NT=TOEPFE.length, NR=RUECK.length;
 
 function freshState(){
   const now=new Date();
-  return {v:1,jahr:now.getFullYear(),
+  return {v:2,jahr:now.getFullYear(),e:[],rg:{},lic:{},
     t:TOEPFE.map(([n,h])=>({n,h,avg:null,b:null})),
     r:RUECK.map(([n,h])=>({n,h,k:null,s:null})),
     sb:null,kaeufe:[],extra:[],
-    m:MON.map(()=>({w:TOEPFE.map(()=>[null,null,null,null,null]),spar:null,rueck:null,rIdx:null,naechst:null,fehl:"",ueb:null}))};
+    m:MON.map(()=>({closed:false,spar:null,rueck:null,rIdx:null,naechst:null,fehl:"",ueb:null}))};
 }
 let S=load();
 function load(){
-  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1&&s.t&&s.m){migrate(s);return s;}}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&(s.v===1||s.v===2)&&s.t&&s.m){migrate(s);return s;}}catch(e){}
   return freshState();
 }
 function migrate(s){
+  if(s.v===1){ // Wochensummen aus Version 1 in Einträge umwandeln
+    s.e=[]; s.rg={};
+    s.m.forEach((M,mi)=>{
+      (M.w||[]).forEach((ws,ti)=>ws.forEach((v,k)=>{
+        if(v!=null&&v!==0){const d=new Date(s.jahr,mi,k*7+1,12);
+          s.e.push({id:"w"+mi+"_"+ti+"_"+k,datum:d.toISOString().slice(0,10),ort:"",artikel:"Wochensumme (übernommen)",gruppe:null,betrag:v,t:ti,r:null});}
+      }));
+      delete M.w; M.closed=!!M.closed;
+    });
+    s.v=2;
+  }
+  s.e=s.e||[]; s.rg=s.rg||{}; s.lic=s.lic||{};
   // Alt: "Haus & Gesundheit" in "Haus" und "Gesundheit" teilen, auf 12 Rücklagen erweitern
   if(s.r.length===8&&s.r[4].n==="Haus & Gesundheit"){
     const sh=i=>(i!=null&&i>=5)?i+2:i;
@@ -158,14 +343,37 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function nin(path,val,extra=""){return `<input class="num" inputmode="decimal" data-p="${path}" data-ty="n" value="${numStr(val)}" ${extra}>`;}
 function tin(path,val,extra=""){return `<input class="txt" data-p="${path}" data-ty="t" value="${esc(val)}" ${extra}>`;}
 
+/* ---------- Freischaltung ---------- */
+function cyrb53(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}
+h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
+const CODES={starter:"1aqi4ut1er0",scan:"2aw2nxo9wwv"};
+const has=m=>!!(S.lic&&S.lic[m]);
+function tryCode(raw){
+  const c=String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(!c)return {ok:false,msg:"Bitte den Code eingeben."};
+  const h=cyrb53("bs1|"+c);
+  for(const m in CODES){ if(CODES[m]===h){ S.lic=S.lic||{}; S.lic[m]=true; save(); return {ok:true,mod:m,msg:m==="starter"?"Freigeschaltet: Budget-Starter. Viel Erfolg!":"Freigeschaltet: Bon einlesen. Du findest es im Tab „Erfassen“."}; } }
+  return {ok:false,msg:"Dieser Code ist ungültig. Bitte prüfe die Schreibweise."};
+}
 /* ---------- Berechnungen ---------- */
+function monthPassed(mi){const n=new Date();return S.jahr<n.getFullYear()||(S.jahr===n.getFullYear()&&mi<n.getMonth());}
+function weekSums(mi){
+  const w=S.t.map(()=>[0,0,0,0,0]);
+  S.e.forEach(e=>{
+    if(e.t==null||!e.datum)return;
+    const y=+e.datum.slice(0,4),m=+e.datum.slice(5,7)-1,d=+e.datum.slice(8,10);
+    if(y!==S.jahr||m!==mi||!w[e.t])return;
+    w[e.t][Math.min(4,Math.floor((d-1)/7))]+=N0(e.betrag);
+  });
+  return w.map(a=>a.map(r2));
+}
 function calcMonth(mi,depth=0){
-  const M=S.m[mi];
+  const M=S.m[mi], WK=weekSums(mi), closed=!!M.closed||monthPassed(mi);
   const rows=S.t.map((t,i)=>{
-    const w=M.w[i], sum=r2(w.reduce((a,x)=>a+N0(x),0)), bud=t.b, f5=w[4]!=null;
+    const w=WK[i], sum=r2(w.reduce((a,x)=>a+x,0)), bud=t.b;
     let left=bud==null?null:r2(bud-sum), st="";
-    if(bud!=null) st=sum>bud?"drüber":f5?"Toll gemacht!":sum>=0.8*bud?"knapp":"ok";
-    return {sum,bud,wk:bud==null?null:bud/4,left,st,f5};
+    if(bud!=null) st=sum>bud?"drüber":closed?"Toll gemacht!":sum>=0.8*bud?"knapp":"ok";
+    return {sum,bud,wk:bud==null?null:bud/4,left,st,w};
   });
   const tSum=r2(rows.reduce((a,r)=>a+r.sum,0));
   const budRows=rows.filter(r=>r.bud!=null);
@@ -178,8 +386,8 @@ function calcMonth(mi,depth=0){
   const fehl=(J==null||!active)?null:Math.max(0,r2(-J));
   const nv=rest==null?null:r2(rest-N0(M.spar)-N0(M.rueck)-N0(M.naechst));
   const carryOut=r2(N0(M.naechst)-(M.fehl==="Ja"?N0(fehl):0));
-  const allDone=budRows.length>0&&budRows.every(r=>r.f5);
-  return {rows,tSum,tBud,ueb,J,rest,fehl,nv,carryOut,active,allDone};
+  const allDone=budRows.length>0&&closed;
+  return {rows,tSum,tBud,ueb,J,rest,fehl,nv,carryOut,active,allDone,closed};
 }
 function carry(mi){ if(mi<0)return 0; const M=S.m[mi]; const c=calcMonth(mi); return c.carryOut; }
 function monthMsg(c){
@@ -215,16 +423,16 @@ function rStand(i,asOf){
   const pm=r.k==null?0:r.k/12;
   const ex=S.extra.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.b),0);
   const mon=S.m.reduce((a,M)=>a+((M.rIdx===i)?N0(M.rueck):0),0);
-  const ent=S.kaeufe.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.b),0);
+  const ent=S.kaeufe.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.b),0)+S.e.filter(e=>e.r===i).reduce((a,e)=>a+N0(e.betrag),0);
   return {pm,ms:monthsSaved(asOf),ex,mon,ent,stand:r2(N0(r.s)+pm*monthsSaved(asOf)+ex+mon-ent)};
 }
 
 /* ---------- Views ---------- */
 const V={},P={};
-V.start=()=>`
+V.startMain=()=>`
 <h2>Monatsflash Budget-Starter</h2>
 <p class="sub">Dein Geld im Blick, in vier einfachen Schritten. Ohne Stress und ohne Verzicht.</p>
-<div class="card"><b>Schritt 1 · 30 Tage beobachten.</b><br>Trage jede Woche im Tab „Monat“ ein, wie viel du in jedem Topf ausgegeben hast (Summe aus deinen Kassenbons oder dem Kontoauszug). Mehr nicht. Das Budget bleibt noch leer. Du lernst nur kennen, wohin dein Geld wirklich fließt.</div>
+<div class="card"><b>Schritt 1 · 30 Tage beobachten.</b><br>Erfasse im Tab „Erfassen“ deine Ausgaben: Kassenbon fotografieren oder einlesen, oder Rechnungen und Ausgaben kurz von Hand eintragen. Die Wochensummen im Tab „Monat“ rechnen sich von selbst. Das Budget bleibt noch leer. Du lernst nur kennen, wohin dein Geld wirklich fließt.</div>
 <div class="card"><b>Schritt 2 · Budget festlegen.</b><br>Nach 1 bis 2 Monaten kennst du deinen Durchschnitt. Trage ihn im Tab „Budget“ ein und lege deine Obergrenzen fest. Das Wochenbudget (Monatsbudget ÷ 4) rechnet sich von selbst. Im Tab „Monat“ siehst du dann sofort, wo du stehst.</div>
 <div class="card"><b>Schritt 3 · Rücklagen bilden.</b><br>Große, unregelmäßige Ausgaben (TÜV, Weihnachten, Urlaub, Kleidergröße) sparst du in kleinen Raten im Voraus an. Der Tab „Rücklagen“ rechnet dir aus, wie viel du pro Monat zurücklegen musst und wie viel schon da ist.</div>
 <div class="card"><b>Schritt 4 · Jahresabschluss.</b><br>Im Tab „Jahr“ siehst du, was du ausgegeben und wie viel du gespart hast: aufs Sparkonto, in Rücklagen und pro Topf.</div>
@@ -232,7 +440,7 @@ V.start=()=>`
 <div class="card"><div class="row"><div style="flex:0 0 90px"><input class="num" value="Gelb" readonly style="text-align:center"></div><div class="hint" style="flex:1">Hier schreibst du etwas hinein.</div></div>
 <div class="row" style="margin-top:8px"><div style="flex:0 0 90px" class="calc">Grau</div><div class="hint" style="flex:1">Das rechnet sich von selbst. Hier musst du nichts tun.</div></div></div>
 <h3>Ein Beispiel</h3>
-<div class="card"><b>Einkauf.</b> In Woche 1 warst du dreimal einkaufen: 38,50 € + 12,90 € + 9,40 €. Das macht 60,80 €. Diese Summe schreibst du bei „Lebensmittel & Getränke“ in „Woche 1“.</div>
+<div class="card"><b>Einkauf.</b> Du warst einkaufen. Fotografiere den Bon oder lade ihn hoch. Die App liest ihn, sortiert die Artikel in deine Töpfe, und du prüfst nur kurz. Ohne Bon trägst du die Ausgabe einfach von Hand ein.</div>
 <div class="card"><b>Rücklage.</b> Das Auto braucht im Jahr ungefähr 900 € (TÜV, Inspektion, Reifen). 900 € ÷ 12 = 75 €. Du legst also jeden Monat 75 € per Dauerauftrag auf ein eigenes Konto zurück. Wird der TÜV fällig, zahlst du von dort und dein Monatsbudget bleibt unberührt.</div>
 <h3>Was gehört wohin?</h3>
 <div class="card"><b>Alltag.</b> Ins Monatsbudget gehört nur, was du regelmäßig im Alltag brauchst: Essen, Drogerie, Kind, Tanken, Tierfutter, Außer Haus und Freizeit.</div>
@@ -241,6 +449,14 @@ V.start=()=>`
 <div class="card"><div class="lab">Dein Jahr</div><input class="num" inputmode="numeric" data-p="jahr" data-ty="n" value="${S.jahr}"><div class="hint">Es erscheint in den Überschriften und bestimmt, welches Jahr du führst.</div></div>
 <p class="hint">Deine Daten bleiben nur auf diesem Gerät. Über das Menü (⋯ oben rechts) kannst du eine Sicherung speichern.</p>`;
 
+V.start=()=>has("starter")?V.startMain():`
+<h2>Monatsflash Budget-Starter</h2>
+<p class="sub">Dein Geld im Blick, in vier einfachen Schritten. Ohne Stress und ohne Verzicht.</p>
+<div class="card soft"><b>Freischaltcode eingeben</b><p class="hint" style="margin:4px 0 8px">Den Code hast du nach deinem Kauf bekommen. Du gibst ihn nur einmal ein.</p>
+<input class="txt" id="codeStart" placeholder="Dein Code" autocomplete="off" autocapitalize="characters">
+<button class="btn" data-unlock="start" style="width:100%;margin-top:8px">Freischalten</button><div class="hint" id="codeStartMsg" style="margin-top:6px"></div></div>
+<div class="card"><b>Was ist das?</b><br>Eine einfache Budget-App für Familien: Du legst fest, wie viel du pro Monat in Alltags-Töpfen ausgeben möchtest, trägst deine Ausgaben ein und siehst sofort, wo du stehst. Für große Ausgaben bildest du Rücklagen, und am Jahresende zeigt dir der Jahresabschluss, was du gespart hast. Deine Daten bleiben nur auf deinem Gerät.</div>
+<div class="card"><b>Schon freigeschaltet?</b><br>Dann stelle bitte sicher, dass du die App auf demselben Handy öffnest, auf dem du den Code eingegeben hast. Hast du eine Sicherung, lade sie im Menü (⋯ oben rechts) unter „Sicherung laden“.</div>`;
 V.budget=()=>`
 <h2>Mein Budget</h2>
 <p class="sub">Lege nach 1 bis 2 Monaten fest, wie viel du pro Monat in jedem Topf ausgeben möchtest. Tipp: Nimm deinen Durchschnitt als Ausgangspunkt und setze die Grenze etwas darunter, aber so, dass du dich nicht knebelst.</p>
@@ -265,11 +481,11 @@ V.monat=()=>{
   const chips=MON.map((n,i)=>`<button data-mon="${i}" class="${i===UI.m?"on":""}">${n}</button>`).join("");
   const cards=S.t.map((t,i)=>`<div class="card">
 <div class="row"><span class="name">${esc(t.n)}</span><span class="badge" id="st-${i}"></span></div>
-<div class="weeks">${[0,1,2,3,4].map(k=>`<div><label>Woche ${k+1}</label>${nin(`m.${UI.m}.w.${i}.${k}`,M.w[i][k],`data-wk="1" data-i="${i}"`)}</div>`).join("")}</div>
+<div class="weeks">${[0,1,2,3,4].map(k=>`<div><label>Woche ${k+1}</label><div class="calc wc" id="w-${i}-${k}"></div></div>`).join("")}</div>
 <div class="stats"><div>Summe<b id="sum-${i}"></b></div><div>Budget<b id="bud-${i}"></b></div><div>Noch übrig<b id="left-${i}"></b></div></div></div>`).join("");
   const ru=S.r.map((r,i)=>`<option value="${i}" ${M.rIdx===i?"selected":""}>${esc(r.n)}</option>`).join("");
   return `<h2>${MONL[UI.m]} ${S.jahr}</h2>
-<p class="sub">Trage am Ende jeder Woche die Summe pro Topf ein. Rest und Ampel rechnen sich von selbst. Ein Wochenfeld wird rot, wenn du in dieser Woche mehr ausgegeben hast, als dein Wochenbudget erlaubt. Das gleicht sich über den Monat oft wieder aus.</p>
+<p class="sub">Die Wochensummen kommen automatisch aus deinen Bons und Ausgaben (Tab „Erfassen“). Woche 1 sind die Tage 1 bis 7, Woche 2 die Tage 8 bis 14 und so weiter. Ein Wochenfeld wird rot, wenn du in dieser Woche mehr ausgegeben hast, als dein Wochenbudget erlaubt. Das gleicht sich über den Monat oft wieder aus.</p>
 <div class="chips" id="chips">${chips}</div>
 ${cards}
 <div class="card soft">
@@ -279,8 +495,10 @@ ${cards}
 ${UI.m===0?`<div class="hint">Nur bei Übertrag aus dem Vorjahr</div>${nin("m.0.ueb",M.ueb)}`:`<div class="calc" id="ueb"></div><div class="hint">Kommt automatisch aus dem Vormonat.</div>`}
 </div>
 <div class="msg" id="msg"></div>
+<button class="btn sec" id="closeBtn" data-close="1" style="width:100%"></button>
+<p class="hint">Mit „Monat abschließen“ zeigt die Ampel „Toll gemacht!“, wenn du dein Budget eingehalten hast. Ist der Monat vorbei, schließt er sich automatisch.</p>
 <h3>Was machst du mit dem Rest?</h3>
-<p class="hint">Fülle das am Monatsende aus. Unsere Empfehlung: erst sparen, dann den Rest verplanen. Am Ende von Woche 5 (bei 4 Wochen eine 0 eintragen) zeigt die Ampel „Toll gemacht!“.</p>
+<p class="hint">Fülle das am Monatsende aus. Unsere Empfehlung: erst sparen, dann den Rest verplanen.</p>
 <div class="card">
 <div class="row"><span>Restbetrag dieses Monats</span><b id="rest"></b></div>
 <div class="lab">→ aufs Sparkonto überweisen</div>${nin(`m.${UI.m}.spar`,M.spar)}
@@ -306,7 +524,8 @@ P.monat=()=>{
     const l=$("#left-"+i); l.textContent=r.left==null?"–":eur0(r.left); l.className=r.left!=null&&r.left<0?"neg":"";
     const b=$("#st-"+i); b.textContent=r.st; b.className="badge "+({"ok":"b-ok","knapp":"b-knapp","drüber":"b-drueber","Toll gemacht!":"b-toll"}[r.st]||"");
   });
-  $$("[data-wk]").forEach(el=>{const i=+el.dataset.i, v=parseNum(el.value), wk=c.rows[i].wk; el.classList.toggle("over",wk!=null&&v!=null&&v>wk);});
+  c.rows.forEach((r,i)=>r.w.forEach((v,k)=>{const el=$("#w-"+i+"-"+k);el.textContent=v?eur0(v):"–";el.classList.toggle("over",r.wk!=null&&v>r.wk);}));
+  const cb=$("#closeBtn"); if(cb){cb.textContent=M.closed?"Monat wieder öffnen":"Monat abschließen";cb.style.display=monthPassed(UI.m)?"none":"";}
   $("#tsum").textContent=eur(c.tSum);$("#tbud").textContent=eur(c.tBud);
   const tl=$("#tleft"); tl.textContent=c.J==null?"–":eur0(c.J); tl.className=c.J!=null&&c.J<0?"neg":"";
   if(UI.m>0)$("#ueb").textContent=eur0(c.ueb);
@@ -335,7 +554,7 @@ ${tin(`r.${i}.h`,r.h,'style="font-size:13px;margin-top:6px" placeholder="Wofür?
 <div class="hint">Richte ihn am Monatsanfang ein, gleich nach Geldeingang, auf ein eigenes Tagesgeld- oder Unterkonto. Der „Stand jetzt“ ist ein Soll-Stand. Schau ab und zu, ob er zu deinem Kontostand passt.</div></div>
 <button class="btn sec" data-addr="1">+ Weitere Rücklage</button>
 <h3>Käufe aus der Rücklage</h3>
-<p class="hint">Kaufst du etwas, das zu einer Rücklage gehört, trägst du es hier ein. Es wird automatisch von der Rücklage abgezogen und nicht vom Monatsbudget.</p>
+<p class="hint">Kaufst du etwas, das zu einer Rücklage gehört, wählst du beim Erfassen die Rücklage aus. Es wird dann automatisch von der Rücklage abgezogen und nicht vom Monatsbudget. Hier kannst du zusätzlich Käufe von Hand eintragen.</p>
 <div id="listK"></div><button class="btn sec" data-add="kaeufe">+ Kauf eintragen</button>
 <h3>Extra eingezahlt</h3>
 <p class="hint">Überweist du zusätzlich zum Dauerauftrag Geld aufs Rücklagenkonto (zum Beispiel Geldgeschenke), trägst du es hier ein. Monatsreste aus dem Tab „Monat“ kommen automatisch hinein.</p>
@@ -406,6 +625,221 @@ V.jahr=()=>{
 <tr class="tot"><td>Zusammen</td><td>${eur(r2(rt.k))}</td><td>${eur(r2(rt.p))}</td><td>${eur(r2(rt.e))}</td><td>${eur(r2(rt.s))}</td></tr></table></div>`;
 };
 
+
+V.erfassen=()=>{
+  const chips=MON.map((n,i)=>`<button data-mon="${i}" class="${i===UI.m?"on":""}">${n}</button>`).join("");
+  return `<h2>Erfassen</h2>
+<p class="sub">Kassenbon einlesen oder Ausgaben von Hand eintragen. Die Wochensummen im Tab „Monat“ rechnen sich daraus von selbst.</p>
+${has("scan")?"":`<div class="card soft"><b>🔒 Bon einlesen (Erweiterung)</b><p class="hint" style="margin:4px 0 0">Mit der Erweiterung fotografierst du deinen Kassenbon, und die App sortiert alle Artikel in deine Töpfe. Den Code für die Erweiterung gibst du im Menü (⋯ oben rechts) unter „Freischalten“ ein. Ausgaben von Hand eintragen kannst du auch ohne.</p></div>`}
+<div ${has("scan")?"":"hidden"}>
+<h3 style="margin-top:6px">Kassenbon einlesen</h3>
+<div class="scanbtns">
+<button class="btn" data-scan="foto">📷 Bon fotografieren</button>
+<button class="btn sec" data-scan="datei">📄 Foto oder PDF wählen</button>
+<button class="btn sec" data-scan="text">📋 Text einfügen</button>
+<button class="btn sec" data-scan="ki">✨ Vorlage für KI-App</button></div>
+<input type="file" id="fFoto" accept="image/*" capture="environment" hidden>
+<input type="file" id="fDatei" accept="application/pdf,image/*,text/plain,.txt,.pdf" hidden>
+<div id="textWrap" hidden class="card"><textarea id="bonText" placeholder="Bon-Text hier einfügen"></textarea><button class="btn" data-scan="textgo" style="margin-top:8px">Text auswerten</button></div>
+<div class="hint" id="scanMsg"></div>
+<div id="rv" hidden class="card soft"></div>
+</div>
+<h3>Ausgabe oder Rechnung von Hand eintragen</h3>
+<div class="card">
+<div class="grid2"><div><div class="lab">Datum</div><input type="date" id="mDatum" value="${new Date().toISOString().slice(0,10)}"></div>
+<div><div class="lab">Betrag</div><input class="num" inputmode="decimal" id="mBetrag" placeholder="0,00"></div></div>
+<div class="lab">Wohin gehört es?</div><select id="mZiel">${targetOptions("")}</select>
+<div class="lab">Notiz (freiwillig)</div><input class="txt" id="mNotiz" placeholder="zum Beispiel Tankstelle Aral">
+<button class="btn" id="mAdd" style="margin-top:10px;width:100%">Eintragen</button>
+<div class="hint" id="mMsg" style="margin-top:6px"></div></div>
+<h3>Meine Einträge</h3>
+<div class="chips" id="chips">${chips}</div>
+<div id="eList"></div>`;
+};
+function targetOptions(sel){
+  const o=(v,n)=>`<option value="${v}" ${sel===v?"selected":""}>${esc(n)}</option>`;
+  return `<option value="">Bitte wählen</option><optgroup label="Alltag (Monatsbudget)">${S.t.map((t,i)=>o("t"+i,t.n)).join("")}</optgroup><optgroup label="Aus einer Rücklage bezahlt">${S.r.map((r,i)=>o("r"+i,r.n)).join("")}</optgroup>`;
+}
+function targetName(e){return e.t!=null?(S.t[e.t]?S.t[e.t].n:"?"):e.r!=null?"Rücklage: "+(S.r[e.r]?S.r[e.r].n:"?"):"nicht zugeordnet";}
+function targetOf(g){
+  if(/^Tanken/.test(g))return "t3";
+  const b=SBParser.BEREICH[g]||g;
+  const m={"Lebensmittel":"t0","Getränke":"t0","Haushalt & Reinigung":"t1","Drogerie, Körperpflege & Hygiene":"t1","Baby & Kind":"t2","Haustier":"t4","Außer Haus":"t5","Freizeit & Hobby":"t6",
+   "Gesundheit & Apotheke":"r5","Haus & Garten":"r4","Auto & Mobilität":"r0","Kleidung & Schuhe":"r6"};
+  return m[b]||"";
+}
+function splitTarget(v){return v&&v[0]==="t"?{t:+v.slice(1),r:null}:v&&v[0]==="r"?{t:null,r:+v.slice(1)}:{t:null,r:null};}
+function newId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+P.erfassen=()=>{
+  if(rv)renderRv(); else $("#rv").hidden=true;
+  const ym=S.jahr+"-"+String(UI.m+1).padStart(2,"0");
+  const E=S.e.filter(e=>(e.datum||"").slice(0,7)===ym).sort((a,b)=>b.datum.localeCompare(a.datum));
+  const total=r2(E.reduce((a,e)=>a+N0(e.betrag),0));
+  const bons={},out=[];
+  E.forEach(e=>{ if(e.bon){(bons[e.bon]=bons[e.bon]||[]).push(e);} });
+  const seen={};
+  E.forEach(e=>{
+    if(e.bon){ if(seen[e.bon])return; seen[e.bon]=1;
+      const L=bons[e.bon],sum=r2(L.reduce((a,x)=>a+N0(x.betrag),0));
+      out.push(`<details class="bon"><summary><span><b>${esc(e.ort||"Bon")}</b><br><small class="hint">${e.datum.split("-").reverse().join(".")} · ${L.length} Positionen</small></span><b>${eur0(sum)}</b></summary>
+      ${L.map(x=>`<div class="erow"><span>${esc(x.artikel)}<small>${esc(targetName(x))}</small></span><span>${eur0(x.betrag)}</span></div>`).join("")}
+      <div class="erow"><span></span><button class="btn red" data-delbon="${esc(e.bon)}" style="padding:6px 10px">Bon löschen</button></div></details>`);
+    } else {
+      out.push(`<div class="card" style="padding:0"><div class="erow" style="border:0"><span>${esc(e.artikel||targetName(e))}<small>${e.datum.split("-").reverse().join(".")} · ${esc(targetName(e))}</small></span><span><b>${eur0(e.betrag)}</b> <button class="x" data-dele="${esc(e.id)}" aria-label="Löschen">✕</button></span></div></div>`);
+    }
+  });
+  $("#eList").innerHTML=(out.length?`<div class="hint">${E.length} Einträge · zusammen ${eur0(total)}</div>`:"<div class=\"hint\">In diesem Monat noch nichts erfasst.</div>")+out.join("");
+};
+
+/* --- Bon einlesen --- */
+const TESS="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+const PDFW="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const loaded={};
+let rv=null, rvDupOk=false;
+function setScan(t,cls){const m=document.getElementById("scanMsg");if(!m)return;m.className="hint "+(cls||"");m.textContent=t;}
+  function loadScript(src){
+    return new Promise(function(res,rej){
+      if(loaded[src])return res();
+      var s=document.createElement("script");s.src=src;
+      s.onload=function(){loaded[src]=1;res()};
+      s.onerror=function(){rej(new Error("Das Auslese-Modul konnte nicht geladen werden. Dafür wird beim ersten Mal Internet gebraucht."))};
+      document.head.appendChild(s);
+    });
+  }
+  function prepCanvas(src,w,h){
+    var sc=w<1600?1600/w:(w>2600?2600/w:1);
+    var c=document.createElement("canvas");c.width=Math.round(w*sc);c.height=Math.round(h*sc);
+    var x=c.getContext("2d");x.drawImage(src,0,0,c.width,c.height);
+    try{
+      var id=x.getImageData(0,0,c.width,c.height),d=id.data,hist=new Array(256).fill(0),i,g;
+      for(i=0;i<d.length;i+=4){g=Math.round(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114);d[i]=d[i+1]=d[i+2]=g;hist[g]++}
+      var tot=c.width*c.height,acc=0,lo=0,hi=255;
+      for(i=0;i<256;i++){acc+=hist[i];if(acc>tot*0.02){lo=i;break}}
+      acc=0;for(i=255;i>=0;i--){acc+=hist[i];if(acc>tot*0.2){hi=i;break}}
+      if(hi-lo<30){lo=0;hi=255}
+      for(i=0;i<d.length;i+=4){g=Math.max(0,Math.min(255,Math.round((d[i]-lo)*255/(hi-lo))));d[i]=d[i+1]=d[i+2]=g}
+      x.putImageData(id,0,0);
+    }catch(e){}
+    return c;
+  }
+  function fileToCanvas(file){
+    return new Promise(function(res,rej){
+      var url=URL.createObjectURL(file),img=new Image();
+      img.onload=function(){URL.revokeObjectURL(url);res(prepCanvas(img,img.naturalWidth,img.naturalHeight))};
+      img.onerror=function(){URL.revokeObjectURL(url);rej(new Error("Das Bild konnte nicht gelesen werden."))};
+      img.src=url;
+    });
+  }
+  function ocr(canvas){
+    return loadScript(TESS).then(function(){
+      return Tesseract.createWorker("deu",1,{logger:function(m){
+        if(m.status==="recognizing text")setScan("Text wird erkannt … "+Math.round(m.progress*100)+" %");
+        else setScan("Sprachdaten werden vorbereitet … (beim ersten Mal etwas länger)");
+      }});
+    }).then(function(w){
+      return w.setParameters({tessedit_pageseg_mode:"6",preserve_interword_spaces:"1"})
+        .then(function(){return w.recognize(canvas)})
+        .then(function(r){return w.terminate().then(function(){return r.data.text})});
+    });
+  }
+  function itemsToLines(items){
+    var rows=[];
+    items.forEach(function(it){
+      if(!it.str||!it.str.trim())return;
+      var y=Math.round(it.transform[5]),row=null;
+      for(var i=0;i<rows.length;i++){if(Math.abs(rows[i].y-y)<=2){row=rows[i];break}}
+      if(!row){row={y:y,its:[]};rows.push(row)}
+      row.its.push({x:it.transform[4],s:it.str,w:it.width||0});
+    });
+    rows.sort(function(a,b){return b.y-a.y});
+    return rows.map(function(r){
+      r.its.sort(function(a,b){return a.x-b.x});
+      var out="",endX=null;
+      r.its.forEach(function(i){
+        if(endX!==null){if(i.x-endX>3)out+="  ";else if(i.x-endX>0.5&&!/\s$/.test(out))out+=" "}
+        out+=i.s;endX=i.x+i.w;
+      });
+      return out.trim();
+    }).join("\n");
+  }
+  function pdfText(file){
+    return loadScript(PDFJS).then(function(){
+      pdfjsLib.GlobalWorkerOptions.workerSrc=PDFW;return file.arrayBuffer();
+    }).then(function(buf){return pdfjsLib.getDocument({data:buf}).promise}).then(function(doc){
+      var ps=[];
+      for(var i=1;i<=doc.numPages;i++)ps.push(doc.getPage(i).then(function(pg){return pg.getTextContent()}).then(function(tc){return itemsToLines(tc.items)}));
+      return Promise.all(ps).then(function(a){
+        var t=a.join("\n");
+        if(t.replace(/\s/g,"").length>40)return t;
+        return doc.getPage(1).then(function(pg){
+          var vp=pg.getViewport({scale:2}),c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;
+          return pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise.then(function(){return ocr(c)});
+        });
+      });
+    });
+  }
+  function handleFile(f){
+    if(!f)return;
+    var n=(f.name||"").toLowerCase(),p;
+    setScan("Bon wird gelesen …");
+    if(f.type==="application/pdf"||/\.pdf$/.test(n))p=pdfText(f);
+    else if((f.type||"").indexOf("image/")===0)p=fileToCanvas(f).then(ocr);
+    else p=f.text();
+    p.then(function(t){startReview(t)}).catch(function(e){setScan("Das hat nicht geklappt: "+(e&&e.message?e.message:e),"err")});
+  }
+  var KI_VORLAGE="Du bekommst das Foto, den Screenshot oder das PDF eines Kassenbons. Bei langen Bons können es mehrere Bilder sein, die sich überlappen: Setze sie in der richtigen Reihenfolge zu einem einzigen Bon zusammen und führe Zeilen, die in zwei Bildern vorkommen, nur einmal auf. Lies alle Artikelzeilen und gib sie als reinen Text aus: pro Artikel eine Zeile, 5 Felder getrennt durch Semikolon, ohne Überschrift, ohne Tabelle, ohne Erklärung.\nAufbau: Bon-Nr.;Datum;Geschäft;Artikel;Betrag\nBeispiel: 1;10.10.2026;Lidl;Paprika rot;3,43\n\nRegeln:\n- Bon-Nr. ist immer 1.\n- Datum als TT.MM.JJJJ.\n- Geschäft: kurzer Name (z. B. Lidl).\n- Artikel genau so schreiben, wie er auf dem Bon steht (ein Semikolon im Artikel weglassen).\n- Betrag in Euro mit Dezimalkomma, ohne €-Zeichen. Bei Menge > 1 den Gesamtbetrag der Zeile.\n- Rabatte, Gutscheine und Pfand-Rückgaben als eigene Zeile mit negativem Betrag.\n- Nicht aufnehmen: Summe, Zahlungsart, MwSt, Karten- und Kundennummern, Namen, Adressen, Uhrzeit.\n- Wenn eine Zeile unleserlich ist: Artikel = [unleserlich] und den Betrag, wenn lesbar.\n\nGib die Zeilen in einem Codeblock aus. Schreibe danach in einer eigenen Zeile: Summe laut Bon: …";
+function startReview(text){
+  const r=SBParser.parseBon(text,{});
+  rv={markt:r.markt||"",datum:r.datum||new Date().toISOString().slice(0,10),belegNr:r.belegNr,summeBon:r.summeBon,warn:r.warnungen,datumFehlt:!r.datum,
+      pos:r.positionen.map(p=>{const key=SBParser.normKey(p.name);const lern=S.rg[key];const tg=lern||targetOf(p.gruppe);return {name:p.name,netto:p.netto,gruppe:p.gruppe,target:tg,sicher:p.sicher&&!!tg,key};})};
+  rvDupOk=false;
+  renderRv();
+  setScan(r.positionen.length?r.positionen.length+" Positionen erkannt. Bitte kurz prüfen.":"Es wurden keine Positionen erkannt. Du kannst sie unten von Hand ergänzen oder einen besseren Scan versuchen.",r.positionen.length?"ok":"err");
+  $("#rv").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function rvCheck(){
+  const s=r2(rv.pos.reduce((a,p)=>a+N0(p.netto),0)),c=$("#rvChk");
+  if(rv.summeBon===null)c.textContent="Erkannt: "+eur0(s)+" · Die Summe laut Bon wurde nicht gefunden.";
+  else if(Math.abs(s-rv.summeBon)<0.005){c.className="chk";c.textContent="Summe stimmt: "+eur0(s)+" laut Bon und erkannt ✓";}
+  else{c.className="chk err";c.textContent="Summe stimmt nicht: Bon "+eur0(rv.summeBon)+", erkannt "+eur0(s)+" (Unterschied "+eur0(r2(s-rv.summeBon))+")";}
+  if(rv.summeBon===null||Math.abs(s-rv.summeBon)<0.005)c.className="chk";
+}
+function renderRv(){
+  const box=$("#rv"); box.hidden=false;
+  const ws=rv.warn.filter(w=>!/^Die erkannten Positionen ergeben/.test(w)); if(rv.datumFehlt)ws.push("Das Datum wurde nicht gefunden. Bitte oben eintragen.");
+  box.innerHTML=`<b>Bon prüfen</b>
+  ${ws.length?`<ul class="hint">${ws.map(w=>"<li>"+esc(w)+"</li>").join("")}</ul>`:""}
+  <div class="grid2"><div><div class="lab">Geschäft</div><input class="txt" id="rvMarkt" value="${esc(rv.markt)}"></div><div><div class="lab">Datum</div><input type="date" id="rvDatum" value="${esc(rv.datum)}"></div></div>
+  <div id="rvList">${rv.pos.map((p,i)=>`<div class="pos ${p.sicher?"":"unsure"}">
+    <div class="r1"><input class="txt" data-rn="${i}" value="${esc(p.name)}" aria-label="Artikel"><input class="num" inputmode="decimal" data-ra="${i}" value="${numStr(p.netto)}" aria-label="Betrag"></div>
+    <div class="r1" style="margin-top:6px"><select data-rt="${i}" style="flex:1">${targetOptions(p.target)}</select><button class="x" data-rx="${i}" aria-label="Position entfernen">✕</button></div>
+    ${p.sicher?"":`<div class="hint">Bitte prüfen, wohin das gehört.</div>`}</div>`).join("")}</div>
+  <button class="btn sec" data-rv="add" style="margin-top:6px">+ Position ergänzen</button>
+  <div class="chk" id="rvChk"></div><div class="hint err" id="rvMsg"></div>
+  <div class="row" style="margin-top:8px"><button class="btn" data-rv="ok" id="rvOk" style="flex:1">Übernehmen</button><button class="btn sec" data-rv="no">Verwerfen</button></div>`;
+  rvCheck();
+}
+function rvCommit(){
+  const msg=$("#rvMsg");msg.textContent="";
+  const markt=$("#rvMarkt").value.trim(),datum=$("#rvDatum").value;
+  if(!markt){msg.textContent="Bitte das Geschäft eintragen, zum Beispiel Lidl.";return;}
+  if(!datum){msg.textContent="Bitte das Datum eintragen.";return;}
+  if(!rv.pos.length){msg.textContent="Es gibt keine Positionen.";return;}
+  for(const p of rv.pos){ if(!p.name.trim()){msg.textContent="Bei einer Position fehlt der Artikelname.";return;} if(!p.target){msg.textContent="Bitte bei jeder Position auswählen, wohin sie gehört.";return;} }
+  const beleg=rv.belegNr?markt.toLowerCase().replace(/\s+/g,"")+"|"+datum+"|"+rv.belegNr:"";
+  if(beleg&&S.e.some(e=>e.beleg===beleg)&&!rvDupOk){rvDupOk=true;msg.textContent="Dieser Bon ist schon eingetragen. Tippe nochmal, wenn du ihn trotzdem übernehmen willst.";$("#rvOk").textContent="Trotzdem übernehmen";return;}
+  const bon=newId("b");
+  rv.pos.forEach((p,i)=>{
+    const tg=splitTarget(p.target);
+    S.e.push({id:newId("p"),bon,beleg,datum,ort:markt,artikel:p.name.trim(),gruppe:p.gruppe,betrag:p.netto,t:tg.t,r:tg.r,summeBon:rv.summeBon});
+    if(p.geaendert)S.rg[p.key||SBParser.normKey(p.name)]=p.target;
+  });
+  const n=rv.pos.length,sum=r2(rv.pos.reduce((a,p)=>a+p.netto,0));
+  UI.m=Math.min(+datum.slice(5,7)-1,11);
+  save(); rv=null; render(); setScan("Übernommen: "+n+" Positionen, "+eur0(sum)+" bei "+markt+".","ok");
+}
+
 /* ---------- Steuerung ---------- */
 function setPath(path,val){
   const k=path.split("."); let o=S;
@@ -413,12 +847,14 @@ function setPath(path,val){
   o[k[k.length-1]]=val;
 }
 function render(){
+  if(!has("starter")&&UI.v!=="start")UI.v="start";
   $("#main").innerHTML=V[UI.v]();
+  $("#nav").style.display=has("starter")?"":"none";
   $$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===UI.v));
   paint();
 }
 function paint(){ if(P[UI.v])P[UI.v](); }
-function go(v){UI.v=v;render();window.scrollTo(0,0);}
+function go(v){UI.v=has("starter")?v:"start";render();window.scrollTo(0,0);}
 document.addEventListener("input",e=>{
   const el=e.target; if(!el.dataset||!el.dataset.p)return;
   const ty=el.dataset.ty; let val;
@@ -432,10 +868,54 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",e=>{
   const el=e.target; if(el.dataset&&el.dataset.p==="jahr")render();
 });
+document.addEventListener("input",e=>{
+  const el=e.target; if(!rv||!el.dataset)return;
+  if(el.dataset.rn!=null){rv.pos[+el.dataset.rn].name=el.value;}
+  else if(el.dataset.ra!=null){const v=parseNum(el.value);if(v!=null){rv.pos[+el.dataset.ra].netto=r2(v);rvCheck();}}
+});
+document.addEventListener("change",e=>{
+  const el=e.target; if(!el.dataset)return;
+  if(el.id==="fFoto"||el.id==="fDatei"){handleFile(el.files[0]);return;}
+  if(rv&&el.dataset.rt!=null){const p=rv.pos[+el.dataset.rt];p.target=el.value;p.sicher=!!el.value;p.geaendert=true;renderRv();}
+});
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
+  if(b.dataset.unlock){doUnlock("#codeStart","#codeStartMsg");return;}
+  if(b.dataset.scan){
+    const k=b.dataset.scan;
+    if(k==="foto"){$("#fFoto").value="";$("#fFoto").click();}
+    else if(k==="datei"){$("#fDatei").value="";$("#fDatei").click();}
+    else if(k==="text"){const w=$("#textWrap");w.hidden=!w.hidden;if(!w.hidden)$("#bonText").focus();}
+    else if(k==="textgo"){const t=$("#bonText").value;if(!t.trim()){setScan("Bitte zuerst den Text des Bons einfügen.","err");return;}startReview(t);}
+    else if(k==="ki"){
+      const ok=()=>setScan("Vorlage kopiert. Füge sie in deiner KI-App ein und lade das Foto des Bons dazu hoch (Karten- und Kundennummern vorher abdecken). Kopiere dann die Antwort und füge sie unter „Text einfügen“ ein.","ok");
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(KI_VORLAGE).then(ok,()=>setScan("Kopieren nicht möglich.","err"));else setScan("Kopieren nicht möglich.","err");
+    }
+    return;
+  }
+  if(b.dataset.rv){
+    if(b.dataset.rv==="no"){rv=null;$("#rv").hidden=true;setScan("");}
+    else if(b.dataset.rv==="add"){rv.pos.push({name:"",netto:0,gruppe:"Nicht zugeordnet",target:"",sicher:false,geaendert:true});renderRv();}
+    else if(b.dataset.rv==="ok")rvCommit();
+    return;
+  }
+  if(b.dataset.rx!=null){rv.pos.splice(+b.dataset.rx,1);renderRv();return;}
+  if(b.id==="mAdd"){
+    const bt=parseNum($("#mBetrag").value),zl=$("#mZiel").value,dt=$("#mDatum").value,m=$("#mMsg");
+    if(bt==null||bt<=0){m.className="hint err";m.textContent="Bitte einen Betrag eintragen.";return;}
+    if(!zl){m.className="hint err";m.textContent="Bitte auswählen, wohin die Ausgabe gehört.";return;}
+    if(!dt){m.className="hint err";m.textContent="Bitte das Datum eintragen.";return;}
+    const tg=splitTarget(zl),notiz=$("#mNotiz").value.trim();
+    S.e.push({id:newId("m"),datum:dt,ort:"",artikel:notiz,gruppe:null,betrag:r2(bt),t:tg.t,r:tg.r});
+    save(); UI.m=+dt.slice(5,7)-1; $("#mBetrag").value="";$("#mNotiz").value="";
+    m.className="hint ok";m.textContent="Eingetragen: "+eur0(r2(bt))+" · "+(tg.t!=null?S.t[tg.t].n:"Rücklage "+S.r[tg.r].n);
+    $("#chips").innerHTML=MON.map((n,i)=>`<button data-mon="${i}" class="${i===UI.m?"on":""}">${n}</button>`).join(""); paint(); return;
+  }
+  if(b.dataset.dele){if(confirm("Diesen Eintrag löschen?")){S.e=S.e.filter(x=>x.id!==b.dataset.dele);save();paint();}return;}
+  if(b.dataset.delbon){if(confirm("Den ganzen Bon löschen?")){S.e=S.e.filter(x=>x.bon!==b.dataset.delbon);save();paint();}return;}
+  if(b.dataset.close){S.m[UI.m].closed=!S.m[UI.m].closed;save();paint();return;}
   if(b.dataset.v){go(b.dataset.v);return;}
-  if(b.dataset.mon!=null){UI.m=+b.dataset.mon;render();return;}
+  if(b.dataset.mon!=null){UI.m=+b.dataset.mon;if(UI.v==='erfassen'){$$('#chips button').forEach((x,i)=>x.classList.toggle('on',i===UI.m));paint();}else render();return;}
   if(b.dataset.addr){S.r.push({n:"Eigene Rücklage "+(S.r.length-6),h:"",k:null,s:null});save();render();return;}
   if(b.dataset.add){
     S[b.dataset.add].push({r:null,w:"",d:new Date().toISOString().slice(0,10),b:null});
@@ -457,15 +937,20 @@ function exportData(){
   a.download="budget-starter-sicherung-"+new Date().toISOString().slice(0,10)+".json";
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
 }
+function doUnlock(inputId,msgId){
+  const r=tryCode($(inputId).value), m=$(msgId); m.className="hint "+(r.ok?"ok":"err"); m.textContent=r.msg;
+  if(r.ok){ $(inputId).value=""; setTimeout(()=>{menu.classList.remove("on");if(r.mod==="starter")go("start");else render();},900); }
+}
+$("#mCode").onclick=()=>doUnlock("#codeIn","#codeMsg");
 $("#mExport").onclick=exportData;
 $("#mImport").onclick=()=>$("#file").click();
 $("#file").onchange=ev=>{
   const f=ev.target.files[0]; if(!f)return;
   const rd=new FileReader();
   rd.onload=()=>{
-    try{const d=JSON.parse(rd.result); if(!(d&&d.v===1&&d.t&&d.m&&d.r))throw 0;
+    try{const d=JSON.parse(rd.result); if(!(d&&(d.v===1||d.v===2)&&d.t&&d.m&&d.r))throw 0;
       if(!confirm("Deine aktuellen Daten werden durch die Sicherung ersetzt. Fortfahren?"))return;
-      S=d; save(); menu.classList.remove("on"); render();
+      migrate(d); d.lic=Object.assign({},S.lic||{},d.lic||{}); S=d; save(); menu.classList.remove("on"); render();
     }catch(e){alert("Diese Datei ist keine gültige Sicherung.");}
   };
   rd.readAsText(f); ev.target.value="";
@@ -473,7 +958,7 @@ $("#file").onchange=ev=>{
 $("#mPrint").onclick=()=>{menu.classList.remove("on");window.print();};
 $("#mReset").onclick=()=>{
   if(!confirm("Wirklich ALLE Daten löschen? Das kannst du nicht rückgängig machen. Speichere vorher eine Sicherung."))return;
-  S=freshState(); save(); menu.classList.remove("on"); go("start");
+  const lic=S.lic; S=freshState(); S.lic=lic; save(); menu.classList.remove("on"); go("start");
 };
 $("#mNew").onclick=()=>{
   if(!confirm("Neues Jahr beginnen? Eine Sicherung des alten Jahres wird gespeichert. Dein Budget und deine Rücklagen-Stände werden übernommen, die Monate beginnen leer. Ein offener Übertrag aus Dezember wandert in den Januar."))return;
@@ -482,7 +967,7 @@ $("#mNew").onclick=()=>{
   const stands=S.r.map((_,i)=>rStand(i,asOf).stand);
   const dec=carry(11);
   S.r.forEach((r,i)=>{r.s=r2(stands[i]);});
-  S.sb=(y+1)+"-01"; S.kaeufe=[]; S.extra=[]; S.jahr=y+1;
+  S.sb=(y+1)+"-01"; S.kaeufe=[]; S.extra=[]; S.e=[]; S.jahr=y+1;
   S.m=freshState().m; S.m[0].ueb=dec||null;
   UI.m=0; save(); menu.classList.remove("on"); go("monat");
 };
